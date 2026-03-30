@@ -1,0 +1,13 @@
+{
+  "name": "colinpowers",
+  "displayName": "Colinpowers",
+  "description": "Custom development workflow: Linear integration, branch management, three-tier model selection, and collaborative design skills for Cursor",
+  "version": "1.0.0",
+  "author": {
+    "name": "Antoine Colin"
+  },
+  "license": "UNLICENSED",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks-cursor.json"
+}

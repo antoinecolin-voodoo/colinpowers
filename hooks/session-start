@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+using_workflow_content=$(cat "${PLUGIN_ROOT}/skills/using-workflow/SKILL.md" 2>&1 || echo "Error reading using-workflow skill")
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+escaped=$(escape_for_json "$using_workflow_content")
+session_context="<IMPORTANT>\nYour workflow skills are loaded via the colinpowers plugin.\n\n**Below is your 'using-workflow' skill — your entry point for all skills. For all other skills, read them when referenced:**\n\n${escaped}\n</IMPORTANT>"
+
+printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+
+exit 0
