@@ -9,11 +9,22 @@ Custom Cursor plugin with tailored development workflow skills:
 
 ## Installation
 
-In Cursor Agent chat:
+### Local install (development / personal use)
 
+Symlink the repo into Cursor's local plugins directory:
+
+```bash
+mkdir -p ~/.cursor/plugins/local
+ln -sf /path/to/colinpowers ~/.cursor/plugins/local/colinpowers
 ```
-/add-plugin colinpowers
-```
+
+Then restart Cursor (or run **Developer: Reload Window**).
+
+Verify: your skills should appear in **Settings > Rules** under the "Agent Decides" section.
+
+### Team install (requires Teams/Enterprise plan)
+
+Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugins > Team Marketplaces > Import**.
 
 ## Models
 
