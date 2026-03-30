@@ -11,16 +11,23 @@ Custom Cursor plugin with tailored development workflow skills:
 
 ### Local install (development / personal use)
 
-Symlink the repo into Cursor's local plugins directory:
+Copy the repo into Cursor's local plugins directory:
 
 ```bash
 mkdir -p ~/.cursor/plugins/local
-ln -sf /path/to/colinpowers ~/.cursor/plugins/local/colinpowers
+cp -R /path/to/colinpowers ~/.cursor/plugins/local/colinpowers
 ```
 
 Then restart Cursor (or run **Developer: Reload Window**).
 
-Verify: your skills should appear in **Settings > Rules** under the "Agent Decides" section.
+Verify: the plugin should appear in **Settings > Plugins** under the installed section.
+
+> **Note:** Cursor's plugin loader uses `fs.readdir` with `withFileTypes`, which returns `isDirectory() = false` for symlinks. A symlink will be silently skipped — use a real directory copy.
+>
+> To sync changes from the source repo after editing:
+> ```bash
+> rm -rf ~/.cursor/plugins/local/colinpowers && cp -R /path/to/colinpowers ~/.cursor/plugins/local/colinpowers
+> ```
 
 ### Team install (requires Teams/Enterprise plan)
 
