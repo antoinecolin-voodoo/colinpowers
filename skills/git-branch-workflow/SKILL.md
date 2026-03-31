@@ -25,7 +25,7 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
    Pattern: `feature/<parent-segment>-<short-description>` with a **single hyphen chain** after `feature/`.  
    **Why:** Git cannot create `feature/guild-shop/cart` when `feature/guild-shop` already exists as a branch. Collapse the parent to a slug and join with hyphens, e.g. `feature/guild-shop-cart-fix`.
 
-   Example parent `feature/guild-shop` + task “fix cart totals” → `feature/guild-shop-cart-fix`.
+   Example parent `feature/guild-shop` + task "fix cart totals" -> `feature/guild-shop-cart-fix`.
 
 5. **Create and push**  
    ```bash
@@ -57,15 +57,29 @@ Goal: a **clean parent history**. Sub-feature work should land as one commit per
 
 Use `git rebase -i` (onto parent or appropriate base) or squash merge strategy consistent with your local policy; the requirement is **one logical commit per issue** (or single commit) before merge/PR.
 
-### 3. Linear update
+### 3. Sync with parent branch
+
+Before merging or opening a PR, bring the parent's latest changes into the sub-feature branch:
+
+1. `git fetch origin <parent-branch>`
+2. `git merge origin/<parent-branch>` (into the current sub-feature branch)
+
+**If merge conflicts occur:**
+
+- **Simple conflicts** (a few files, clear resolution): describe the conflicts to the user, propose a resolution for each file, and apply only after the user confirms.
+- **Complex conflicts** (many files, ambiguous intent, or risky resolutions): alert the user, list the conflicting files, and **stop**. Let the user resolve manually. Resume the finishing workflow once the user confirms conflicts are resolved and committed.
+
+Do not force-resolve conflicts or guess intent. When in doubt, ask.
+
+### 4. Linear update
 
 - Set linked issue(s) to **In Review** using the **`linear-integration`** skill (or project-equivalent workflow).
 
-### 4. Merge or PR — ask the user
+### 5. Merge or PR -- ask the user
 
 Present two options clearly.
 
-**Option 1 — Merge into parent (local integration)**
+**Option 1 -- Merge into parent (local integration)**
 
 1. `git checkout <parent-branch>`
 2. `git pull` (fast-forward parent if applicable)
@@ -75,21 +89,21 @@ Present two options clearly.
 6. Delete sub-feature on remote: `git push origin --delete <sub-feature-branch>`
 7. **Stay on** `<parent-branch>`
 
-No extra confirmation for branch deletion after merge—this is the default for Option 1.
+No extra confirmation for branch deletion after merge -- this is the default for Option 1.
 
-**Option 2 — Open pull request**
+**Option 2 -- Open pull request**
 
 1. Ensure squashed branch is pushed: `git push -u origin <sub-feature-branch>`
 2. Create PR with GitHub CLI, **base = parent branch**, not `main`:
 
    ```bash
-   gh pr create --base <parent-branch> --title "…" --body "…"
+   gh pr create --base <parent-branch> --title "..." --body "..."
    ```
 
 3. Summarize changes in the PR body (what changed, how to test, linked issues).
 4. **Keep** the sub-feature branch on remote until the PR is merged; remote branch is removed by the hosting provider when the PR merges, if configured.
 
-### 5. Checkout parent when done
+### 6. Checkout parent when done
 
 After Option 1, you are already on parent. After Option 2, run `git checkout <parent-branch>` so the working tree matches ongoing feature work.
 
@@ -99,9 +113,10 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 
 | Rule | Detail |
 |------|--------|
-| Branch names | Descriptive slugs from **titles** or task text—**never** Linear IDs alone or as the primary name. |
+| Branch names | Descriptive slugs from **titles** or task text -- **never** Linear IDs alone or as the primary name. |
 | Squash | **Required** before merging to parent or opening PR. |
-| PR base | **Parent feature branch** only—not `main` / `master` unless the user explicitly overrides for an exception. |
+| Parent sync | **Required** after squash, before merge or PR. Resolve conflicts with user before proceeding. |
+| PR base | **Parent feature branch** only -- not `main` / `master` unless the user explicitly overrides for an exception. |
 | Branch deletion | Automatic after Option 1 merge (local + remote). Not deleted on Option 2 until merge via hosting UI. |
 
 ---
@@ -110,33 +125,36 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 
 | Phase | Key commands / actions |
 |-------|-------------------------|
-| Start | `git branch --show-current` → confirm parent → `git checkout -b feature/<parent-slug>-<desc>` → `git push -u origin …` |
+| Start | `git branch --show-current` -> confirm parent -> `git checkout -b feature/<parent-slug>-<desc>` -> `git push -u origin ...` |
 | Specs | Remove task-local `docs/specs/*.md`, stage deletions |
-| Squash | One issue → one commit `CUP-123: …`; many issues → rebase grouping + user confirm; no issue → one descriptive commit |
+| Squash | One issue -> one commit `CUP-123: ...`; many issues -> rebase grouping + user confirm; no issue -> one descriptive commit |
+| Sync | `git fetch origin <parent>` -> `git merge origin/<parent>` into sub-feature; resolve conflicts with user |
 | Linear | In Review via `linear-integration` |
-| Merge | checkout parent → pull → merge sub-feature → push parent → `branch -d` / `push origin --delete` |
+| Merge | checkout parent -> pull -> merge sub-feature -> push parent -> `branch -d` / `push origin --delete` |
 | PR | `gh pr create --base <parent>` |
 
 ---
 
 ## Common mistakes
 
-- **Nested branch names** like `feature/foo/bar` when `feature/foo` is already a branch—Git rejects this. Use `feature/foo-bar-baz` instead.
-- **Linear IDs in branch names**—hard to read in logs and tabs; keep IDs in commit messages and PR titles where useful.
-- **Opening PRs against `main`** while the real integration target is the long-lived feature branch—breaks team flow and review scope.
-- **Skipping squash**—clutters parent with WIP and fixup commits.
-- **Forgetting `git push -u`** on a new branch—next session or CI cannot see the branch.
-- **Deleting the sub-feature branch before push** when the user chose PR—lose the remote reference for the PR.
+- **Nested branch names** like `feature/foo/bar` when `feature/foo` is already a branch -- Git rejects this. Use `feature/foo-bar-baz` instead.
+- **Linear IDs in branch names** -- hard to read in logs and tabs; keep IDs in commit messages and PR titles where useful.
+- **Opening PRs against `main`** while the real integration target is the long-lived feature branch -- breaks team flow and review scope.
+- **Skipping squash** -- clutters parent with WIP and fixup commits.
+- **Skipping parent sync** -- merging or opening a PR without pulling the latest parent risks hidden conflicts that surface later or break CI.
+- **Forgetting `git push -u`** on a new branch -- next session or CI cannot see the branch.
+- **Deleting the sub-feature branch before push** when the user chose PR -- lose the remote reference for the PR.
 
 ---
 
 ## Red flags
 
-- Current branch is `main` (or production default) and the user did not confirm switching to a feature parent—**do not** invent a sub-feature off `main` without explicit instruction.
-- Uncommitted or untracked spec files outside `docs/specs/`—do not delete blindly; only remove specs clearly tied to this task.
-- **Force-push** on a branch others use—coordinate before rewriting shared history.
-- Multiple issues in one branch without a clear grouping—get user confirmation before rebase/squash plan.
-- No `gh` CLI and user wants PR—fall back to web UI instructions with explicit base branch.
+- Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
+- Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
+- **Force-push** on a branch others use -- coordinate before rewriting shared history.
+- Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.
+- No `gh` CLI and user wants PR -- fall back to web UI instructions with explicit base branch.
+- **Merge conflicts during parent sync** -- never auto-resolve; always involve the user.
 
 ---
 
@@ -145,6 +163,6 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 | Caller | When |
 |--------|------|
 | **brainstorming** | After design is agreed, hand off **Starting work** steps: parent detection, branch name, `checkout -b`, push. |
-| **subagent-development** / **executing-plans** | When a task slice is **done**, run **Finishing work**: spec cleanup, squash policy, Linear In Review, merge vs PR, checkout parent. |
+| **subagent-development** / **executing-plans** | When a task slice is **done**, run **Finishing work**: spec cleanup, squash policy, parent sync, Linear In Review, merge vs PR, checkout parent. |
 
 This skill **replaces** older flows that assumed a fresh clone per task or finishing only against `main`: one long-lived clone, parent feature branch, sub-feature branches, squash, merge or PR **to parent**.
