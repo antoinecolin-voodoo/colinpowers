@@ -58,11 +58,13 @@ digraph process {
         "Mark task complete in TodoWrite" [shape=box];
     }
 
+    "Branch check (git-branch-workflow start)" [shape=box style=filled fillcolor=lightyellow];
     "Read plan, extract all tasks with full text, note context, create TodoWrite" [shape=box];
     "More tasks remain?" [shape=diamond];
     "Dispatch final code reviewer subagent for entire implementation" [shape=box];
     "Use git-branch-workflow (finish)" [shape=box style=filled fillcolor=lightgreen];
 
+    "Branch check (git-branch-workflow start)" -> "Read plan, extract all tasks with full text, note context, create TodoWrite";
     "Read plan, extract all tasks with full text, note context, create TodoWrite" -> "Dispatch implementer subagent (./implementer-prompt.md)";
     "Dispatch implementer subagent (./implementer-prompt.md)" -> "Implementer subagent asks questions?";
     "Implementer subagent asks questions?" -> "Answer questions, provide context" [label="yes"];
@@ -134,11 +136,23 @@ Implementer subagents report one of four statuses:
 - `./spec-reviewer-prompt.md` — spec compliance reviewer
 - `./code-quality-reviewer-prompt.md` — code quality reviewer
 
+## Branch check (before first task)
+
+Before dispatching any implementer, verify your branch state:
+
+1. Run `git branch --show-current`.
+2. If you are on `main`, `master`, or `develop` — **stop**. Invoke **git-branch-workflow** (Starting work) to create a sub-feature branch before any code changes.
+3. If the current branch is a feature branch but this plan warrants its own sub-feature branch — invoke **git-branch-workflow** (Starting work).
+4. If brainstorming or writing-plans already created the branch — confirm it is checked out and proceed.
+
+Do not skip this step even if the plan does not mention branching.
+
 ## Example workflow
 
 ```
 You: I'm using subagent-development to execute this plan.
 
+[Branch check: git branch --show-current → create sub-feature branch if needed]
 [Read plan once, extract all tasks with full text and context]
 [Create TodoWrite with all tasks]
 

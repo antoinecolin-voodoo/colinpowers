@@ -16,6 +16,16 @@ Assume a skilled developer who does not know your stack or domain deeply.
 **Save plans to:** `docs/plans/YYYY-MM-DD-<feature-name>.md`  
 (User preferences for plan location override this default.)
 
+## Branch Check
+
+Before writing or committing the plan file, verify your branch state:
+
+1. Run `git branch --show-current`.
+2. If you are on `main`, `master`, or `develop` — **stop**. Invoke **git-branch-workflow** (Starting work) to create a sub-feature branch first.
+3. If brainstorming already created the branch — confirm it is checked out and proceed.
+
+The plan file and all subsequent commits must land on a working branch, not the default branch.
+
 ## Scope Check
 
 If the spec spans multiple independent subsystems, it should already be split in brainstorming. If not, recommend separate plans—one per subsystem. Each plan should deliver working software on its own.

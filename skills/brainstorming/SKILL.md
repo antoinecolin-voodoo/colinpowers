@@ -25,10 +25,12 @@ You MUST create a task for each of these items and complete them in order:
 2. **Ask clarifying questions** — one at a time; understand purpose, constraints, and success criteria
 3. **Propose 2–3 approaches** — with trade-offs and your recommendation
 4. **Present design** — in sections scaled to their complexity; get user approval after each section
-5. **Write design doc** — save to `docs/specs/YYYY-MM-DD-<topic>-design.md` and commit (user preferences for spec location override this default)
-6. **Spec review loop** — use Cursor’s **Task** tool to dispatch a spec-document-reviewer subagent (see `skills/brainstorming/spec-document-reviewer-prompt.md`); use the **standard** model profile (**claude-4.6-sonnet-medium**). Address reported issues in the spec; repeat until approved or you reach **3 iterations**, whichever comes first
-7. **User reviews written spec** — ask the user to review the spec file before proceeding
-8. **Transition to implementation** — follow **linear-integration** (link or confirm Linear issue as appropriate) → **git-branch-workflow** (**start**) → **writing-plans**
+5. **Linear integration** — follow **linear-integration** (link or confirm Linear issue as appropriate)
+6. **Branch setup** — follow **git-branch-workflow** (**start**) to create the working branch before any commits
+7. **Write design doc** — save to `docs/specs/YYYY-MM-DD-<topic>-design.md` and commit on the new branch (user preferences for spec location override this default)
+8. **Spec review loop** — use Cursor's **Task** tool to dispatch a spec-document-reviewer subagent (see `skills/brainstorming/spec-document-reviewer-prompt.md`); use the **standard** model profile (**claude-4.6-sonnet-medium**). Address reported issues in the spec; repeat until approved or you reach **3 iterations**, whichever comes first
+9. **User reviews written spec** — ask the user to review the spec file before proceeding
+10. **Transition to implementation** — invoke **writing-plans**
 
 ## Process Flow
 
@@ -39,11 +41,11 @@ digraph brainstorming {
     "Propose 2-3 approaches" [shape=box];
     "Present design sections" [shape=box];
     "User approves design?" [shape=diamond];
+    "linear-integration" [shape=box];
+    "git-branch-workflow (start)" [shape=box style=filled fillcolor=lightyellow];
     "Write design doc" [shape=box];
     "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)" [shape=box];
     "User reviews spec?" [shape=diamond];
-    "linear-integration" [shape=box];
-    "git-branch-workflow (start)" [shape=box];
     "writing-plans" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
@@ -51,17 +53,17 @@ digraph brainstorming {
     "Propose 2-3 approaches" -> "Present design sections";
     "Present design sections" -> "User approves design?";
     "User approves design?" -> "Present design sections" [label="no, revise"];
-    "User approves design?" -> "Write design doc" [label="yes"];
+    "User approves design?" -> "linear-integration" [label="yes"];
+    "linear-integration" -> "git-branch-workflow (start)";
+    "git-branch-workflow (start)" -> "Write design doc";
     "Write design doc" -> "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)";
     "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)" -> "User reviews spec?";
     "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "linear-integration" [label="approved"];
-    "linear-integration" -> "git-branch-workflow (start)";
-    "git-branch-workflow (start)" -> "writing-plans";
+    "User reviews spec?" -> "writing-plans" [label="approved"];
 }
 ```
 
-**Terminal state:** after the user approves the written spec, run **linear-integration**, then **git-branch-workflow** with the **start** action, then invoke **writing-plans**. Do not skip to coding, frontend-only tooling, or other implementation paths before that sequence.
+**Terminal state:** after the user approves the design, run **linear-integration**, then **git-branch-workflow** with the **start** action to create the working branch. All subsequent commits (spec, spec revisions) land on this branch. After the user approves the written spec, invoke **writing-plans**. Do not skip to coding, frontend-only tooling, or other implementation paths before that sequence.
 
 ## The Process
 
@@ -104,29 +106,36 @@ digraph brainstorming {
 
 ## After the Design
 
+**Linear integration and branch setup:**
+
+Once the user approves the design (before writing anything to disk):
+
+1. **linear-integration** — link or confirm the Linear issue for this work (or follow that skill when no issue applies).
+2. **git-branch-workflow** — **start** a branch appropriate to the issue or task.
+
+All subsequent file writes and commits happen on the new branch.
+
 **Documentation:**
 
 - Write the validated design (spec) to `docs/specs/YYYY-MM-DD-<topic>-design.md` (user preferences for spec location override this default)
-- Commit the design document to git
+- Commit the design document to git (on the working branch)
 
 **Spec review loop (subagent):**
 
-1. Dispatch the reviewer using Cursor’s **Task** tool. Load the prompt template from `skills/brainstorming/spec-document-reviewer-prompt.md`, substitute the actual spec path for `[SPEC_FILE_PATH]`, and run the subagent with the **standard** model (**claude-4.6-sonnet-medium**).
+1. Dispatch the reviewer using Cursor's **Task** tool. Load the prompt template from `skills/brainstorming/spec-document-reviewer-prompt.md`, substitute the actual spec path for `[SPEC_FILE_PATH]`, and run the subagent with the **standard** model (**claude-4.6-sonnet-medium**).
 2. If the reviewer reports **Issues Found**, fix the spec, commit if you use version control for docs, and dispatch again. Stop when the reviewer **Approves** or after **3** review rounds — if still not clean after three rounds, summarize remaining risks for the user and decide together whether to revise the spec or proceed with explicit caveats.
 
 **User review gate:**
 
 After the spec review loop, ask the user to review the written spec before continuing:
 
-> Spec written and committed to `<path>`. Please review it and let me know if you want any changes before we continue to Linear, branch setup, and the implementation plan.
+> Spec written and committed to `<path>` on branch `<branch-name>`. Please review it and let me know if you want any changes before we continue to the implementation plan.
 
-Wait for the user’s response. If they request changes, update the spec, re-run the spec review loop (still respecting the iteration cap from the current round’s baseline), and only proceed once they approve.
+Wait for the user's response. If they request changes, update the spec, re-run the spec review loop (still respecting the iteration cap from the current round's baseline), and only proceed once they approve.
 
 **Implementation handoff:**
 
-1. **linear-integration** — link or confirm the Linear issue for this work (or follow that skill when no issue applies).
-2. **git-branch-workflow** — **start** a branch appropriate to the issue or task.
-3. **writing-plans** — produce the detailed implementation plan from the approved spec.
+1. **writing-plans** — produce the detailed implementation plan from the approved spec.
 
 Do not invoke other implementation skills before **writing-plans** completes for this spec.
 

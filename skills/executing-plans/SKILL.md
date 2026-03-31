@@ -15,6 +15,17 @@ Load the plan, review it critically, execute tasks in order, then close out with
 
 ## The process
 
+### Step 0: Branch check
+
+Before executing any code changes, verify your branch state:
+
+1. Run `git branch --show-current`.
+2. If you are on `main`, `master`, or `develop` — **stop**. Invoke **git-branch-workflow** (Starting work) to create a sub-feature branch before writing any code.
+3. If the current branch is a feature branch but this plan warrants its own sub-feature branch — invoke **git-branch-workflow** (Starting work).
+4. If brainstorming already created the branch — confirm it is checked out and proceed.
+
+Do not skip this step even if the plan does not mention branching.
+
 ### Step 1: Load and review plan
 
 1. Read the plan file (or the plan the user pasted).

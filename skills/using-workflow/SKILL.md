@@ -17,13 +17,24 @@ description: Use when starting any conversation — colinpowers entry point for 
 | **executing-plans** | Running a written plan in order with checkpoints. |
 | **subagent-development** | Same, but one **Task** subagent per separable task. |
 | **dispatching-parallel** | Two or more independent tasks safe to run in parallel. |
-| **git-branch-workflow** | Starting, integrating, or closing branch work. |
+| **git-branch-workflow** | **Before any implementation** (code changes, plan execution, bug fixes) — check current branch and create a sub-feature branch if needed. Also when integrating or closing branch work. |
 | **linear-integration** | Linear issues / workflow via **call_mcp_tool** (MCP). |
 | **requesting-code-review** | After meaningful work or before merge — structured review pass. |
 | **receiving-code-review** | Acting on review comments before editing further. |
 | **systematic-debugging** | Bugs, failures, or unexpected behavior — before speculative fixes. |
 | **verification** | Before claiming done, fixed, or passing — run checks and cite fresh output. |
 | **writing-skills** | Creating or editing colinpowers skills. |
+
+## Implementation gate
+
+Before writing or modifying **any** code (implementation, bug fix, refactor, plan execution), check your branch:
+
+1. Run `git branch --show-current`.
+2. If you are on `main`, `master`, or `develop` — **stop**. Invoke **git-branch-workflow** (Starting work) to create a sub-feature branch before touching code.
+3. If you are on a feature branch and the task warrants a sub-feature branch (new issue, separable slice of work) — invoke **git-branch-workflow** (Starting work).
+4. If you are already on the correct working branch — proceed.
+
+This gate applies even when brainstorming was skipped (direct tasks, quick fixes, one-off requests). The only exception is when the user explicitly says to work on the current branch.
 
 ## Model selection
 
