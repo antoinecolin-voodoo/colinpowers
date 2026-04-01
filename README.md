@@ -1,6 +1,6 @@
 # Colinpowers
 
-Custom Cursor plugin with tailored development workflow skills:
+Custom Cursor plugin, based on [Superpowers](https://github.com/obra/superpowers), with tailored development workflow skills:
 
 - **Cursor-native** — all instructions target Cursor's tool set (Task, Shell, Read, etc.)
 - **Linear integration** — issue tracking via MCP (status updates, backlog search, comments)
