@@ -54,14 +54,15 @@ Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugin
 | **strong**   | `claude-4.6-opus-high`     | Architecture, design review, complex debugging, escalation |
 
 
-## Skills (13)
+## Skills (14)
 
 
 | Skill                    | Description                                 |
 | ------------------------ | ------------------------------------------- |
 | `using-workflow`         | Entry point — routes to other skills        |
 | `brainstorming`          | Socratic design refinement before coding    |
-| `writing-plans`          | Detailed implementation plans from a design |
+| `writing-plans-lean`     | Reference-first plans — shorter, reviewable (default) |
+| `writing-plans`          | Detailed implementation plans with full code |
 | `executing-plans`        | Sequential plan execution with checkpoints  |
 | `subagent-development`   | Subagent-per-task with two-stage review     |
 | `dispatching-parallel`   | Run multiple agents concurrently            |
@@ -81,7 +82,7 @@ Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugin
 2. linear-integration: fetch/search issue → set "In Progress"
 3. brainstorming: design conversation → spec
 4. git-branch-workflow (start): create sub-feature branch
-5. writing-plans: implementation plan
+5. writing-plans-lean: implementation plan
 6. subagent-development: implement tasks with review
 7. verification: confirm everything works
 8. git-branch-workflow (finish): spec cleanup → squash → merge/PR

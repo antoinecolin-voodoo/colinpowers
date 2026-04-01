@@ -80,6 +80,6 @@ Do not push through blockers silently.
 
 | Skill | Role |
 |--------|------|
-| **writing-plans** | Creates the structured plan this skill executes. |
+| **writing-plans-lean** / **writing-plans** | Creates the structured plan this skill executes. |
 | **git-branch-workflow** | **Finishing work** after all tasks: cleanup, squash, merge or PR to parent, branch hygiene. |
 | **subagent-development** | When **Task** subagents are available, split or parallelize execution for suitable plans. |

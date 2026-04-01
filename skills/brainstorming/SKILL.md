@@ -30,7 +30,7 @@ You MUST create a task for each of these items and complete them in order:
 7. **Write design doc** — save to `docs/specs/YYYY-MM-DD-<topic>-design.md` and commit on the new branch (user preferences for spec location override this default)
 8. **Spec review loop** — use Cursor's **Task** tool to dispatch a spec-document-reviewer subagent (see `skills/brainstorming/spec-document-reviewer-prompt.md`); use the **standard** model profile (**claude-4.6-sonnet-medium**). Address reported issues in the spec; repeat until approved or you reach **3 iterations**, whichever comes first
 9. **User reviews written spec** — ask the user to review the spec file before proceeding
-10. **Transition to implementation** — invoke **writing-plans**
+10. **Transition to implementation** — invoke **writing-plans-lean**
 
 ## Process Flow
 
@@ -46,7 +46,7 @@ digraph brainstorming {
     "Write design doc" [shape=box];
     "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)" [shape=box];
     "User reviews spec?" [shape=diamond];
-    "writing-plans" [shape=doublecircle];
+    "writing-plans-lean" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
     "Ask clarifying questions" -> "Propose 2-3 approaches";
@@ -59,11 +59,11 @@ digraph brainstorming {
     "Write design doc" -> "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)";
     "Spec review loop\n(Task: spec-document-reviewer,\nstandard model, max 3)" -> "User reviews spec?";
     "User reviews spec?" -> "Write design doc" [label="changes requested"];
-    "User reviews spec?" -> "writing-plans" [label="approved"];
+    "User reviews spec?" -> "writing-plans-lean" [label="approved"];
 }
 ```
 
-**Terminal state:** after the user approves the design, run **linear-integration**, then **git-branch-workflow** with the **start** action to create the working branch. All subsequent commits (spec, spec revisions) land on this branch. After the user approves the written spec, invoke **writing-plans**. Do not skip to coding, frontend-only tooling, or other implementation paths before that sequence.
+**Terminal state:** after the user approves the design, run **linear-integration**, then **git-branch-workflow** with the **start** action to create the working branch. All subsequent commits (spec, spec revisions) land on this branch. After the user approves the written spec, invoke **writing-plans-lean**. Do not skip to coding, frontend-only tooling, or other implementation paths before that sequence.
 
 ## The Process
 
@@ -135,9 +135,9 @@ Wait for the user's response. If they request changes, update the spec, re-run t
 
 **Implementation handoff:**
 
-1. **writing-plans** — produce the detailed implementation plan from the approved spec.
+1. **writing-plans-lean** — produce the detailed implementation plan from the approved spec.
 
-Do not invoke other implementation skills before **writing-plans** completes for this spec.
+Do not invoke other implementation skills before **writing-plans-lean** completes for this spec.
 
 ## Key Principles
 

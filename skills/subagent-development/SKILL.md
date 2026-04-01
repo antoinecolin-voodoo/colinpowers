@@ -143,7 +143,7 @@ Before dispatching any implementer, verify your branch state:
 1. Run `git branch --show-current`.
 2. If you are on `main`, `master`, or `develop` — **stop**. Invoke **git-branch-workflow** (Starting work) to create a sub-feature branch before any code changes.
 3. If the current branch is a feature branch but this plan warrants its own sub-feature branch — invoke **git-branch-workflow** (Starting work).
-4. If brainstorming or writing-plans already created the branch — confirm it is checked out and proceed.
+4. If brainstorming or writing-plans-lean / writing-plans already created the branch — confirm it is checked out and proceed.
 
 Do not skip this step even if the plan does not mention branching.
 
@@ -244,7 +244,7 @@ Code reviewer: Important: magic number 100.
 ## Integration
 
 **Related skills:**
-- **writing-plans** — produces the plan this skill executes.
+- **writing-plans-lean** / **writing-plans** — produces the plan this skill executes.
 - **requesting-code-review** — template at `requesting-code-review/code-reviewer.md` for reviewer-style output (code quality step references it).
 - **git-branch-workflow** — **finishing** phase after all tasks (squash, merge/PR, cleanup, Linear, etc.).
 
