@@ -33,6 +33,11 @@ Verify: the plugin should appear in **Settings > Plugins** under the installed s
 
 Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugins > Team Marketplaces > Import**.
 
+## Usage
+- Type `/using-workflow` in the first prompt of a conversation (I think this one is actually optional, there is a session-start hook)
+- Enjoy!
+- You can call individual skills from time to time. I've found that particularly useful for `git-branch-workflow` (sometimes the agent forgets about it) and `requesting-code-review` (sometimes you just want an adversarial code review and not the wole workflow).
+
 ## Models
 
 | Alias | Model | Use for |
