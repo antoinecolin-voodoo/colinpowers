@@ -82,7 +82,9 @@ digraph process {
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Use git-branch-workflow (finish)";
+    "Unity validation gate (ask user to open Unity, check .meta + compilation)" [shape=box style=filled fillcolor=lightyellow];
+    "Dispatch final code reviewer subagent for entire implementation" -> "Unity validation gate (ask user to open Unity, check .meta + compilation)";
+    "Unity validation gate (ask user to open Unity, check .meta + compilation)" -> "Use git-branch-workflow (finish)";
 }
 ```
 
@@ -194,6 +196,9 @@ Code reviewer: Important: magic number 100.
 
 [After all tasks: final code reviewer on full diff]
 
+[Unity validation gate: ask user to open Unity Editor, generate .meta files, check compilation — WAIT for confirmation]
+[Commit .meta files]
+
 [Use git-branch-workflow — finishing: squash, PR/merge, cleanup per that skill]
 ```
 
@@ -223,6 +228,7 @@ Code reviewer: Important: magic number 100.
 
 **Never:**
 - Start implementation on `main`/`master` without explicit user consent.
+- Skip the **Unity validation gate** — always ask the user to open Unity and confirm before finishing.
 - Skip spec compliance or code quality review.
 - Proceed with unfixed reviewer findings.
 - Run **multiple implementer subagents in parallel** on the same branch (merge conflicts).

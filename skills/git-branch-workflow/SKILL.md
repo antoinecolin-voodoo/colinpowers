@@ -40,6 +40,24 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 ## Finishing work
 
+### 0. Unity validation gate (mandatory)
+
+**Do not start any finishing step until the user explicitly confirms.**
+
+1. **Stop and ask the user:**
+
+   > All plan tasks are complete. Before I move to the finishing phase, please:
+   >
+   > 1. **Open the Unity Editor** on this project so it generates/updates `.meta` files.
+   > 2. **Check the Console** for compilation errors and let me know the result.
+   >
+   > Once you confirm everything is clean, I'll commit the `.meta` files and proceed with squash, sync, and merge/PR.
+
+2. **Wait for the user's response.** Do not proceed, guess, or skip this step.
+3. After the user confirms:
+   - Stage and commit any new or changed `.meta` files: `git add '*.meta' && git commit -m "chore: add Unity-generated .meta files"` (adjust the message if needed).
+   - Then continue to step 1 (Spec cleanup).
+
 ### 1. Spec cleanup
 
 - Delete any `docs/specs/*.md` files that were introduced for this task.
@@ -150,6 +168,7 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 ## Red flags
 
 - Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
+- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without user confirmation that Unity compiled cleanly and `.meta` files are committed.
 - Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
 - **Force-push** on a branch others use -- coordinate before rewriting shared history.
 - Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.
