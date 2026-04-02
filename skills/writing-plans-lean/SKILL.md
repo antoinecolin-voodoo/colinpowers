@@ -170,10 +170,6 @@ After saving the plan, offer:
 
 **If inline:** require **executing-plans**; batch with explicit review checkpoints between groups of tasks.
 
-## See Also
-
-- **writing-plans** — the original variant with complete paste-ready code in the plan. Use when explicitly requested or when the executor has no codebase access.
-
 ## Remember
 
 - Scope check and file map before tasks.

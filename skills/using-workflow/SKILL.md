@@ -13,8 +13,7 @@ description: Use when starting any conversation — colinpowers entry point for 
 |-------|------|
 | **using-workflow** | This entry skill — routing, models, red flags. |
 | **brainstorming** | Creative or exploratory feature / behavior work before implementation. |
-| **writing-plans-lean** | You have a spec or multi-step requirements — before coding. Reference-first plans (default). |
-| **writing-plans** | Same, but with complete paste-ready code in the plan. Use when explicitly requested. |
+| **writing-plans-lean** | You have a spec or multi-step requirements — before coding. Reference-first plans. |
 | **executing-plans** | Running a written plan in order with checkpoints. |
 | **subagent-development** | Same, but one **Task** subagent per separable task. |
 | **dispatching-parallel** | Two or more independent tasks safe to run in parallel. |

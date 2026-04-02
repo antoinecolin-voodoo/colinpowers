@@ -141,7 +141,7 @@ Rough targets: entry or high-frequency skills **about 200 words or fewer** where
 Use the **skill folder name** in prose. Mark requirement level explicitly:
 
 - **Required:** `Follow **verification** before claiming work is done.`
-- **Optional:** `See **writing-plans** for longer specs.`
+- **Optional:** `See **writing-plans-lean** for implementation plans.`
 
 Avoid `@` file paths that force-load large files into context unless you intend that cost.
 

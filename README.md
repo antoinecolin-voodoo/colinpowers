@@ -54,15 +54,14 @@ Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugin
 | **strong**   | `claude-4.6-opus-high`     | Architecture, design review, complex debugging, escalation |
 
 
-## Skills (14)
+## Skills (13)
 
 
 | Skill                    | Description                                 |
 | ------------------------ | ------------------------------------------- |
 | `using-workflow`         | Entry point — routes to other skills        |
 | `brainstorming`          | Socratic design refinement before coding    |
-| `writing-plans-lean`     | Reference-first plans — shorter, reviewable (default) |
-| `writing-plans`          | Detailed implementation plans with full code |
+| `writing-plans-lean`     | Reference-first plans — shorter, reviewable |
 | `executing-plans`        | Sequential plan execution with checkpoints  |
 | `subagent-development`   | Subagent-per-task with two-stage review     |
 | `dispatching-parallel`   | Run multiple agents concurrently            |
