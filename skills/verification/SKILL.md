@@ -42,6 +42,7 @@ Skip any step = lying, not verifying
 | Claim | Requires | Not Sufficient |
 |-------|----------|----------------|
 | Compiles | Build output: 0 errors | Previous run, "should compile" |
+| Unity compiles + import refresh | Fresh **`check_compile_errors`** (Coplay MCP `user-coplay-mcp`) when available and successful; otherwise human confirmation in Editor | Assuming compile without tool output or user sign-off |
 | Works in editor | Manual Play Mode verification steps | Code looks right, no run |
 | Linter clean | Linter output: 0 errors | Partial check, extrapolation |
 | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
@@ -81,6 +82,13 @@ Skip any step = lying, not verifying
 ```
 ✅ [Run build] [See: exit 0] "Build passes"
 ❌ "Linter passed" (linter doesn't check compilation)
+```
+
+**Unity (Coplay):**
+
+```
+✅ [call_mcp_tool user-coplay-mcp / check_compile_errors] [See: clean compile in response] + commit .meta if changed
+❌ Skip human check when visuals/scenes/UI changed and Coplay cannot validate appearance or Play Mode
 ```
 
 **Acceptance criteria:**

@@ -42,21 +42,41 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 ### 0. Unity validation gate (mandatory)
 
-**Do not start any finishing step until the user explicitly confirms.**
+**Goal before finishing:** Unity has refreshed the asset database (including `.meta` files where applicable) and the project compiles cleanly—or you have explicit human confirmation when automation cannot cover that.
 
-1. **Stop and ask the user:**
+**Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via Coplay evidence and/or human confirmation, as below).
 
-   > All plan tasks are complete. Before I move to the finishing phase, please:
-   >
-   > 1. **Open the Unity Editor** on this project so it generates/updates `.meta` files.
-   > 2. **Check the Console** for compilation errors and let me know the result.
-   >
-   > Once you confirm everything is clean, I'll commit the `.meta` files and proceed with squash, sync, and merge/PR.
+#### A. Automated path — Coplay MCP (`user-coplay-mcp`)
 
-2. **Wait for the user's response.** Do not proceed, guess, or skip this step.
-3. After the user confirms:
-   - Stage and commit any new or changed `.meta` files: `git add '*.meta' && git commit -m "chore: add Unity-generated .meta files"` (adjust the message if needed).
-   - Then continue to step 1 (Spec cleanup).
+When the **Coplay** MCP server is available, call **`check_compile_errors`** via **`call_mcp_tool`** (inspect the tool descriptor under your MCP config if needed). In practice this ties into the Unity Editor: it reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and reports compilation errors.
+
+1. Run **`check_compile_errors`** and read the full response.
+2. If it reports compile errors, fix them (or report blocked state with evidence). **Do not** continue to finishing until the check is clean.
+3. If the MCP call fails (server missing, Unity not connected, project root not set, auth, timeout, etc.), **do not** treat that as proof—fall through to **section B**.
+
+#### B. Human validation — always when Coplay cannot replace it
+
+**Stop and ask the user** (full manual gate) when **any** of these apply:
+
+- Coplay is unavailable or **`check_compile_errors`** did not complete successfully.
+- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment Coplay does not certify.
+- Play Mode, runtime behavior, or acceptance criteria require the user to confirm in the Editor.
+
+Use this prompt:
+
+> All plan tasks are complete. Before I move to the finishing phase, please:
+>
+> 1. **Open the Unity Editor** on this project so it generates/updates `.meta` files (if not already done).
+> 2. **Check the Console** for compilation errors and, if relevant, **verify visuals / Play Mode** for this change.
+>
+> Once you confirm everything is clean (or tell me what to fix), I'll commit `.meta` updates if any and proceed with squash, sync, and merge/PR.
+
+Wait for the user's response. Do not proceed, guess, or skip this step when section B applies.
+
+#### C. After the gate passes
+
+- Run **`git status`**. Stage and commit new or changed **`.meta`** files (and any Unity-generated assets that belong in VCS): e.g. `git add '*.meta'` plus other paths as needed, then commit with an appropriate message (e.g. `chore: Unity meta and import updates`).
+- Then continue to step 1 (Spec cleanup).
 
 ### 1. Spec cleanup
 
@@ -168,7 +188,7 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 ## Red flags
 
 - Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
-- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without user confirmation that Unity compiled cleanly and `.meta` files are committed.
+- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean **`check_compile_errors`** result (when Coplay is used successfully) **and** human confirmation when section B requires it; **and** committing applicable `.meta` / import artifacts after the gate.
 - Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
 - **Force-push** on a branch others use -- coordinate before rewriting shared history.
 - Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.

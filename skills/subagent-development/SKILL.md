@@ -82,9 +82,9 @@ digraph process {
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Unity validation gate (ask user to open Unity, check .meta + compilation)" [shape=box style=filled fillcolor=lightyellow];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Unity validation gate (ask user to open Unity, check .meta + compilation)";
-    "Unity validation gate (ask user to open Unity, check .meta + compilation)" -> "Use git-branch-workflow (finish)";
+    "Unity validation gate (Coplay check_compile_errors and/or human)" [shape=box style=filled fillcolor=lightyellow];
+    "Dispatch final code reviewer subagent for entire implementation" -> "Unity validation gate (Coplay check_compile_errors and/or human)";
+    "Unity validation gate (Coplay check_compile_errors and/or human)" -> "Use git-branch-workflow (finish)";
 }
 ```
 
@@ -196,8 +196,8 @@ Code reviewer: Important: magic number 100.
 
 [After all tasks: final code reviewer on full diff]
 
-[Unity validation gate: ask user to open Unity Editor, generate .meta files, check compilation — WAIT for confirmation]
-[Commit .meta files]
+[Unity validation gate: **git-branch-workflow** §0 — run Coplay **`check_compile_errors`** when MCP available; else or for visual/scene work, ask user to validate in Unity — WAIT when human gate applies]
+[Commit .meta / import changes if any]
 
 [Use git-branch-workflow — finishing: squash, PR/merge, cleanup per that skill]
 ```
@@ -228,7 +228,7 @@ Code reviewer: Important: magic number 100.
 
 **Never:**
 - Start implementation on `main`/`master` without explicit user consent.
-- Skip the **Unity validation gate** — always ask the user to open Unity and confirm before finishing.
+- Skip the **Unity validation gate** — follow **git-branch-workflow** §0 (Coplay **`check_compile_errors`** when available; human confirmation when required); never finish without that gate and committing applicable `.meta` / import files.
 - Skip spec compliance or code quality review.
 - Proceed with unfixed reviewer findings.
 - Run **multiple implementer subagents in parallel** on the same branch (merge conflicts).
