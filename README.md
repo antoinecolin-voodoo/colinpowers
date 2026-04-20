@@ -9,25 +9,44 @@ Custom plugin for **Claude Code** and **Cursor**, based on [Superpowers](https:/
 
 ## Installation
 
-### Claude Code (local install)
+### Claude Code (CLI or VS Code extension)
+
+Claude Code plugins are installed through the marketplace mechanism. The CLI and VS Code extension share `~/.claude/` state, so one install serves both.
+
+**From a local clone (development):**
 
 ```bash
-mkdir -p ~/.claude/plugins/local
-cp -R /path/to/colinpowers ~/.claude/plugins/local/colinpowers
+git clone https://github.com/<owner>/colinpowers.git /path/to/colinpowers
 ```
 
-Restart Claude Code or start a new session. The `SessionStart` hook loads `using-workflow` automatically.
+Then inside a Claude Code session (slash commands work in both CLI and VS Code):
 
-**Verify the install before restarting:**
-
-```bash
-ls ~/.claude/plugins/local/colinpowers/.claude-plugin/plugin.json \
-   ~/.claude/plugins/local/colinpowers/hooks/hooks.json
+```
+/plugin marketplace add /path/to/colinpowers
+/plugin install colinpowers@colinpowers
 ```
 
-Both files must exist. If either is missing (e.g. you used `ln -s` by mistake), the plugin will load silently without hooks. Use a real directory copy, not a symlink.
+**From GitHub (once published):**
 
-**Windows:** hooks are invoked through `hooks/run-hook.cmd`, a polyglot wrapper that locates Git for Windows (`C:\Program Files\Git\bin\bash.exe`) or bash on `PATH`. If neither is installed, the plugin still loads but `SessionStart` context injection is skipped silently.
+```
+/plugin marketplace add <owner>/colinpowers
+/plugin install colinpowers@colinpowers
+```
+
+Start a new session after install. The `SessionStart` hook loads `using-workflow` automatically and appears in your context as `hookSpecificOutput.additionalContext`.
+
+**Verify:**
+
+```
+/plugin marketplace list
+/plugin list
+```
+
+Both `colinpowers` entries should be present. If `/plugin install` failed, check that the repo root contains `.claude-plugin/marketplace.json` — Claude Code requires it even for single-plugin repos.
+
+**Updating a local-clone install:** `git pull` in the clone directory, then `/plugin update colinpowers@colinpowers` in Claude Code.
+
+**Windows:** hooks are invoked through `hooks/run-hook.cmd`, a polyglot wrapper that locates Git for Windows (`C:\Program Files\Git\bin\bash.exe`) or bash on `PATH`. If neither is installed, the plugin still loads but `SessionStart` context injection is silently skipped.
 
 ### Cursor (local install)
 
