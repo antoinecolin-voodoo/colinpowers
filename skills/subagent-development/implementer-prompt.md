@@ -1,8 +1,8 @@
 # Implementer subagent prompt template
 
-Use this template when dispatching an **implementer** subagent via Cursor’s **Task** tool.
+Use this template when dispatching an **implementer** subagent (Claude Code's `Agent` tool or Cursor's `Task` tool).
 
-**Model:** Use `model: "fast"` on the Task call when the task is mechanical (1–2 files, clear spec). Use your environment’s mapping to **standard** or **strong** when the task needs more judgment (see `SKILL.md`).
+**Model:** Use the **fast** tier when the task is mechanical (1–2 files, clear spec). Escalate to **standard** or **strong** when the task needs more judgment (see `SKILL.md` for the tier-to-model mapping per platform).
 
 ```
 Task:

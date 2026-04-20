@@ -4,7 +4,7 @@ Use this template when dispatching a **spec compliance** reviewer subagent after
 
 **Purpose:** Confirm the implementation matches what was requested—nothing missing, nothing unjustified extra.
 
-**Model:** Use **standard** (`claude-4.6-sonnet-medium`) for this role.
+**Model:** Use the **standard** tier for this role (see `subagent-development/SKILL.md` for the tier-to-model mapping per platform).
 
 ```
 Task:

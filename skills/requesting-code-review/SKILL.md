@@ -34,10 +34,11 @@ BASE_SHA=$(git rev-parse origin/main)   # or HEAD~N / a known base commit
 HEAD_SHA=$(git rev-parse HEAD)
 ```
 
-**2. Dispatch via Cursor Task tool**
+**2. Dispatch via your subagent tool**
 
-- Use Cursor’s **Task** tool (or equivalent subagent dispatch) with the **code-reviewer** agent defined in **`agents/code-reviewer.md`**.
-- Build the task **prompt** from the template in **`skills/requesting-code-review/code-reviewer.md`**: substitute every `{…}` placeholder with concrete text and SHAs (see that file for the full structure).
+- Claude Code: `Agent` tool with `subagent_type: "code-reviewer"` (see `agents/code-reviewer.md`).
+- Cursor: `Task` tool targeting the same `agents/code-reviewer.md` agent definition.
+- Build the subagent **prompt** from the template in **`skills/requesting-code-review/code-reviewer.md`**: substitute every `{…}` placeholder with concrete text and SHAs (see that file for the full structure).
 
 **3. Act on feedback**
 

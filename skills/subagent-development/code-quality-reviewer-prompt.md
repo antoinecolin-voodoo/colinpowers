@@ -6,7 +6,7 @@ Use this template when dispatching a **code quality** reviewer subagent.
 
 **Only dispatch after spec compliance review has passed.**
 
-**Model:** Use **standard** (`claude-4.6-sonnet-medium`) by default. Escalate to **strong** (`claude-4.6-opus-high`) for large diffs, security-sensitive code, or when a first pass is inconclusive.
+**Model:** Use the **standard** tier by default. Escalate to **strong** for large diffs, security-sensitive code, or when a first pass is inconclusive. See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.
 
 ## Template
 

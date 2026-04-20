@@ -28,7 +28,7 @@ You MUST create a task for each of these items and complete them in order:
 5. **Linear integration** — follow **linear-integration** (link or confirm Linear issue as appropriate)
 6. **Branch setup** — follow **git-branch-workflow** (**start**) to create the working branch before any commits
 7. **Write design doc** — save to `docs/specs/YYYY-MM-DD-<topic>-design.md` and commit on the new branch (user preferences for spec location override this default)
-8. **Spec review loop** — use Cursor's **Task** tool to dispatch a spec-document-reviewer subagent (see `skills/brainstorming/spec-document-reviewer-prompt.md`); use the **standard** model profile (**claude-4.6-sonnet-medium**). Address reported issues in the spec; repeat until approved or you reach **3 iterations**, whichever comes first
+8. **Spec review loop** — dispatch a spec-document-reviewer subagent via your platform's subagent tool (Claude Code `Agent` or Cursor `Task`; see `skills/brainstorming/spec-document-reviewer-prompt.md`) at the **standard** model tier. Address reported issues in the spec; repeat until approved or you reach **3 iterations**, whichever comes first
 9. **User reviews written spec** — ask the user to review the spec file before proceeding
 10. **Transition to implementation** — invoke **writing-plans-lean**
 
@@ -122,7 +122,7 @@ All subsequent file writes and commits happen on the new branch.
 
 **Spec review loop (subagent):**
 
-1. Dispatch the reviewer using Cursor's **Task** tool. Load the prompt template from `skills/brainstorming/spec-document-reviewer-prompt.md`, substitute the actual spec path for `[SPEC_FILE_PATH]`, and run the subagent with the **standard** model (**claude-4.6-sonnet-medium**).
+1. Dispatch the reviewer using your platform's subagent tool (Claude Code `Agent` or Cursor `Task`). Load the prompt template from `skills/brainstorming/spec-document-reviewer-prompt.md`, substitute the actual spec path for `[SPEC_FILE_PATH]`, and run the subagent at the **standard** model tier.
 2. If the reviewer reports **Issues Found**, fix the spec, commit if you use version control for docs, and dispatch again. Stop when the reviewer **Approves** or after **3** review rounds — if still not clean after three rounds, summarize remaining risks for the user and decide together whether to revise the spec or proceed with explicit caveats.
 
 **User review gate:**

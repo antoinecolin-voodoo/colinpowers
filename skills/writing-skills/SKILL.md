@@ -1,22 +1,24 @@
 ---
 name: writing-skills
-description: Use when creating new skills, editing existing skills, or verifying skills work before deployment in colinpowers or personal/project Cursor skill folders.
+description: Use when creating new skills, editing existing skills, or verifying skills work before deployment in colinpowers or personal/project skill folders (Claude Code or Cursor).
 ---
 
 # Writing Skills
 
 ## Overview
 
-A **skill** is durable documentation the agent loads when a task matches its description. This meta-skill describes how to author skills that are easy to find, cheap in tokens, and safe to reuse.
+A **skill** is durable documentation the agent loads when a task matches its description. This meta-skill describes how to author skills that are easy to find, cheap in tokens, and safe to reuse. Skills in colinpowers are dual-platform — they must read correctly under both Claude Code and Cursor.
 
 **Where skills live**
 
-| Scope | Path |
-|--------|------|
-| Personal (all projects) | `~/.cursor/skills/` |
-| Project (repo-only) | `.cursor/skills/` |
+| Scope | Claude Code | Cursor |
+|-------|-------------|--------|
+| Personal (all projects) | `~/.claude/skills/` | `~/.cursor/skills/` |
+| Project (repo-only) | `.claude/skills/` | `.cursor/skills/` |
 
 **Never** put custom skills in `~/.cursor/skills-cursor/` — that tree is reserved for Cursor built-in skills.
+
+**Dual-platform rule:** use Claude Code tool names (`Agent`, `Bash`, `Edit`, `Read`, `Write`, `Grep`, `Glob`, `TodoWrite`, direct `mcp__…` MCP calls) as canonical in skill prose. When a Cursor equivalent matters (especially for MCP or `Task` dispatch), mention both or point to `skills/using-workflow/references/cursor-tools.md`.
 
 **Flat namespace:** each skill is a folder `skill-name/` with `SKILL.md` at its root (plus optional files). Name folders so they sort and search well.
 
@@ -99,7 +101,7 @@ Failure modes and fixes.
 Concrete payoff (metrics, time saved, risk reduced).
 ```
 
-## Cursor Search Optimization (CSO)
+## Skill search optimization
 
 Future turns match skills mainly via **name**, **description**, and **in-body keywords**. Optimize for that.
 

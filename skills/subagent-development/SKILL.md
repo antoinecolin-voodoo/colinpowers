@@ -92,22 +92,22 @@ digraph process {
 
 Use the **least capable model that still fits the role** to balance cost, latency, and quality.
 
-| Tier | Model name | Use for |
-|------|------------|---------|
-| **fast** | `composer-2-fast` | Mechanical work: 1–2 files, clear spec, straightforward edits |
-| **standard** | `claude-4.6-sonnet-medium` | Multi-file work, integration, judgment calls, **spec compliance review**, **code quality review** |
-| **strong** | `claude-4.6-opus-high` | Architecture, design, hard debugging, escalation when standard is insufficient |
+| Tier | Claude Code | Cursor | Use for |
+|------|-------------|--------|---------|
+| **fast** | `claude-haiku-4-5` | `composer-2-fast` | Mechanical work: 1–2 files, clear spec, straightforward edits |
+| **standard** | `claude-sonnet-4-6` | `claude-4.6-sonnet-medium` | Multi-file work, integration, judgment calls, **spec compliance review**, **code quality review** |
+| **strong** | `claude-opus-4-7` | `claude-4.6-opus-high` | Architecture, design, hard debugging, escalation when standard is insufficient |
 
-**In Cursor:** Invoke the **Task** tool with `model: "fast"` when dispatching a subagent that should run on the fast tier (mechanical implementer tasks). For standard or strong tiers, use the Task tool’s default or the appropriate model setting your environment maps to those names.
+Dispatch a subagent with the platform's subagent tool (`Agent` in Claude Code, `Task` in Cursor) and set the model to the tier above when the tool exposes a model choice. Otherwise the platform's default handles it.
 
 **Implementer subagent:**
-- 1–2 files, complete spec, low ambiguity → **fast** (`composer-2-fast`) + `model: "fast"` on Task.
+- 1–2 files, complete spec, low ambiguity → **fast** tier.
 - Multiple files, integration, or meaningful judgment → **standard**.
 - Blocked after escalation, or task needs architectural reasoning → **strong** (or re-scope the task).
 
-**Spec compliance reviewer:** always **standard** (`claude-4.6-sonnet-medium`).
+**Spec compliance reviewer:** always **standard**.
 
-**Code quality reviewer:** **standard** by default. Escalate to **strong** (`claude-4.6-opus-high`) if the change is large, security-sensitive, or the standard review surface area is too broad to trust.
+**Code quality reviewer:** **standard** by default. Escalate to **strong** if the change is large, security-sensitive, or the standard review surface area is too broad to trust.
 
 **Signals:**
 - Touches 1–2 files with a complete spec → fast implementer.

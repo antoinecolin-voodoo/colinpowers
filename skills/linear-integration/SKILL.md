@@ -3,12 +3,17 @@ name: linear-integration
 description: >-
   Use when working with Linear issue tracking alongside code: linking a session
   to an issue, searching the backlog, updating state and links, or posting
-  targeted comments. Applies MCP server `user-Linear`.
+  targeted comments. Uses the Linear MCP server.
 ---
 
 # Linear integration (MCP)
 
-Coordinate agent work with **Linear** via the **`user-Linear`** MCP server. Invoke tools with **`CallMcpTool`**: set **`server`** to `user-Linear` and **`toolName`** to the tool below; pass arguments as JSON matching each tool’s schema.
+Coordinate agent work with **Linear** via the Linear MCP server. Tool calls below (`get_issue`, `save_issue`, `list_issues`, `save_comment`, `list_issue_statuses`) are the MCP tool names — invoke them with the platform-native MCP call:
+
+- **Claude Code**: call the tool directly, e.g. `mcp__claude_ai_Linear__get_issue({ id: "CUP-123" })`.
+- **Cursor**: wrap in `CallMcpTool { server: "user-Linear", toolName: "get_issue", arguments: { id: "CUP-123" } }`.
+
+See `skills/using-workflow/references/cursor-tools.md` for the full mapping.
 
 **Linked issue (session state):** Once an issue is chosen or confirmed, remember its identifier (e.g. `CUP-123`) for the rest of the task. If the user never links an issue, do not invent one.
 

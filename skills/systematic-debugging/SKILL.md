@@ -50,10 +50,12 @@ Use for **any** technical issue:
 
 ## Model guidance
 
-- **Start** debugging at the **standard** model (`claude-4.6-sonnet-medium`).
-- **Escalate** to the **strong** model (`claude-4.6-opus-high`) if:
+- **Start** debugging at the **standard** model tier.
+- **Escalate** to the **strong** tier if:
   - Phase 2 does not surface a clear pattern (working vs broken comparison stays unclear), or
   - Phase 3 hypotheses keep failing after disciplined minimal tests.
+
+(See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.)
 
 Hard or cross-cutting bugs often need stronger reasoning; do not burn time guessing at the wrong tier.
 

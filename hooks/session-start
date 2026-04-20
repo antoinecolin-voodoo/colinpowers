@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SessionStart hook — dual-platform (Claude Code + Cursor)
+
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -17,8 +19,17 @@ escape_for_json() {
 }
 
 escaped=$(escape_for_json "$using_workflow_content")
-session_context="<IMPORTANT>\nYour workflow skills are loaded via the colinpowers plugin.\n\n**Below is your 'using-workflow' skill — your entry point for all skills. For all other skills, read them when referenced:**\n\n${escaped}\n</IMPORTANT>"
+session_context="<IMPORTANT>\nYour workflow skills are loaded via the colinpowers plugin.\n\n**Below is your 'using-workflow' skill — your entry point for all skills. For all other skills, load them when referenced.**\n\n${escaped}\n</IMPORTANT>"
 
-printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+# Cursor hooks expect additional_context.
+# Claude Code hooks expect hookSpecificOutput.additionalContext.
+# Emit only the field consumed by the current platform to avoid double injection.
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+  printf '{\n  "additional_context": "%s"\n}\n' "$session_context"
+fi
 
 exit 0

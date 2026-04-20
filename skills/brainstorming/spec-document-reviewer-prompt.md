@@ -1,18 +1,18 @@
 # Spec Document Reviewer Prompt Template
 
-Use this template when dispatching a spec document reviewer via Cursor’s **Task** tool.
+Use this template when dispatching a spec document reviewer via your platform's subagent tool (Claude Code `Agent` or Cursor `Task`).
 
 **Purpose:** Verify the spec is complete, consistent, and ready for implementation planning.
 
 **Dispatch after:** The spec document is written under `docs/specs/` (for example `docs/specs/YYYY-MM-DD-<topic>-design.md`).
 
-## Cursor Task tool invocation
+## Subagent dispatch
 
-- Use the **Task** tool to run a subagent whose sole job is spec review.
-- Set the subagent to the **standard** model profile (**claude-4.6-sonnet-medium**) when the tool exposes a model choice.
-- Put the filled prompt below in the Task **prompt** field. Replace `[SPEC_FILE_PATH]` with the repository-relative path to the spec file.
+- Run a subagent whose sole job is spec review.
+- Set the model to the **standard** tier when the tool exposes a model choice (see `subagent-development/SKILL.md` for the tier-to-model mapping per platform).
+- Put the filled prompt below in the subagent's prompt field. Replace `[SPEC_FILE_PATH]` with the repository-relative path to the spec file.
 
-**Example Task fields (illustrative):**
+**Example subagent fields (illustrative):**
 
 - **description:** Short label such as `Review design spec`
 - **prompt:** The full block below, with `[SPEC_FILE_PATH]` replaced

@@ -46,9 +46,9 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 **Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via Coplay evidence and/or human confirmation, as below).
 
-#### A. Automated path — Coplay MCP (`user-coplay-mcp`)
+#### A. Automated path — Coplay MCP
 
-When the **Coplay** MCP server is available, call **`check_compile_errors`** via **`call_mcp_tool`** (inspect the tool descriptor under your MCP config if needed). In practice this ties into the Unity Editor: it reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and reports compilation errors.
+When the **Coplay** MCP server is available, call its **`check_compile_errors`** tool (platform-native MCP syntax — see `skills/using-workflow/references/cursor-tools.md`). In practice this ties into the Unity Editor: it reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and reports compilation errors.
 
 1. Run **`check_compile_errors`** and read the full response.
 2. If it reports compile errors, fix them (or report blocked state with evidence). **Do not** continue to finishing until the check is clean.

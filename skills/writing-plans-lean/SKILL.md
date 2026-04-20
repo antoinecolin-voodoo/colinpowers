@@ -148,8 +148,8 @@ If no Linear issue exists yet, omit the trailing ` [ISSUE-KEY]` from the commit 
 
 After the plan is complete:
 
-1. Use Cursor's **Task** tool to dispatch a **plan-document-reviewer** subagent with a **standard** model profile. Give **only** crafted context: path to the plan file, path to the spec/design doc, and review criteria (scope, paths, reference/contract precision, verify steps, commit hygiene, Linear ID usage). Do not paste full session history.
-2. If the reviewer reports issues: fix the plan document, then **Task** the reviewer again on the **whole** plan.
+1. Dispatch a **plan-document-reviewer** subagent via your platform's subagent tool (Claude Code `Agent` or Cursor `Task`) at the **standard** model tier. Give **only** crafted context: path to the plan file, path to the spec/design doc, and review criteria (scope, paths, reference/contract precision, verify steps, commit hygiene, Linear ID usage). Do not paste full session history.
+2. If the reviewer reports issues: fix the plan document, then re-dispatch the reviewer on the **whole** plan.
 3. If approved: proceed to execution handoff.
 
 **Guidance:** The same agent that wrote the plan applies fixes. If the loop exceeds **3** iterations, stop and ask a human. Reviewer output is advisory—document respectful disagreement if you reject a point.

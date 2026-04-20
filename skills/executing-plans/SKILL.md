@@ -11,7 +11,7 @@ Load the plan, review it critically, execute tasks in order, then close out with
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Subagents:** When Cursor exposes **Task** (subagent types), use **`subagent-development`** for large plans or clearly independent workstreams instead of doing everything in one thread—throughput and focus usually improve.
+**Subagents:** When subagent dispatch is available (Claude Code's `Agent` tool or Cursor's `Task` tool), use **`subagent-development`** for large plans or clearly independent workstreams instead of doing everything in one thread — throughput and focus usually improve.
 
 ## The process
 
@@ -46,7 +46,7 @@ For each task:
 
 After all tasks are complete and verified:
 
-1. **Unity validation gate** — follow **git-branch-workflow** § **Finishing work → 0. Unity validation gate**: when **Coplay** MCP (`user-coplay-mcp`) is available, run **`check_compile_errors`** first for domain reload, `.meta` import side effects, and compile status; if Coplay is unavailable, the check fails, or **visual / scene-facing** work still needs human judgment, ask the user to validate in Unity. Commit `.meta` (and related import) changes after the gate passes.
+1. **Unity validation gate** — follow **git-branch-workflow** § **Finishing work → 0. Unity validation gate**: when the **Coplay** MCP server is available, run **`check_compile_errors`** first for domain reload, `.meta` import side effects, and compile status; if Coplay is unavailable, the check fails, or **visual / scene-facing** work still needs human judgment, ask the user to validate in Unity. Commit `.meta` (and related import) changes after the gate passes.
 2. Announce: "I'm using **git-branch-workflow** (finishing phase) to close out this work."
 3. Apply **`git-branch-workflow`** — section **Finishing work** (from step 1 onward): spec cleanup, squash, Linear update if your project uses it, merge vs PR to the **parent** branch, then checkout parent.
 
