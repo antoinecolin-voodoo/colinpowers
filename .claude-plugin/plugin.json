@@ -5,8 +5,5 @@
   "author": {
     "name": "Antoine Colin"
   },
-  "license": "UNLICENSED",
-  "skills": "./skills/",
-  "agents": "./agents/",
-  "hooks": "./hooks/hooks.json"
+  "license": "UNLICENSED"
 }
