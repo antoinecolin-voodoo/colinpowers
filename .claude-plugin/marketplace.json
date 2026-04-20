@@ -1,6 +1,8 @@
 {
   "name": "colinpowers",
-  "description": "Custom development workflow plugin: Linear integration, branch management, collaborative design skills. Works in Claude Code and Cursor.",
+  "metadata": {
+    "description": "Custom development workflow plugin: Linear integration, branch management, collaborative design skills. Works in Claude Code and Cursor."
+  },
   "owner": {
     "name": "Antoine Colin"
   },
