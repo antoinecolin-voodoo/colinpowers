@@ -92,13 +92,9 @@ digraph process {
 
 Use the **least capable model that still fits the role** to balance cost, latency, and quality.
 
-| Tier | Claude Code | Cursor | Use for |
-|------|-------------|--------|---------|
-| **fast** | `claude-haiku-4-5` | `composer-2-fast` | Mechanical work: 1–2 files, clear spec, straightforward edits |
-| **standard** | `claude-sonnet-4-6` | `claude-4.6-sonnet-medium` | Multi-file work, integration, judgment calls, **spec compliance review**, **code quality review** |
-| **strong** | `claude-opus-4-7` | `claude-4.6-opus-high` | Architecture, design, hard debugging, escalation when standard is insufficient |
+Three tiers: **fast / standard / strong**. For the tier-to-model mapping per platform, see the table in `using-workflow/SKILL.md` (authoritative).
 
-Dispatch a subagent with the platform's subagent tool (`Agent` in Claude Code, `Task` in Cursor) and set the model to the tier above when the tool exposes a model choice. Otherwise the platform's default handles it.
+Dispatch a subagent with the platform's subagent tool (`Agent` in Claude Code, `Task` in Cursor) and set the model to the chosen tier when the tool exposes a model choice. Otherwise the platform's default handles it.
 
 **Implementer subagent:**
 - 1–2 files, complete spec, low ambiguity → **fast** tier.

@@ -4,7 +4,7 @@ Use this template when dispatching a **spec compliance** reviewer subagent after
 
 **Purpose:** Confirm the implementation matches what was requested—nothing missing, nothing unjustified extra.
 
-**Model:** Use the **standard** tier for this role (see `subagent-development/SKILL.md` for the tier-to-model mapping per platform).
+**Model:** Use the **standard** tier for this role (see `./SKILL.md`, and the authoritative per-platform table in `using-workflow/SKILL.md`).
 
 ```
 Task:

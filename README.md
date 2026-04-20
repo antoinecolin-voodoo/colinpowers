@@ -55,13 +55,7 @@ Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugin
 
 ## Models
 
-Three capability tiers, one per platform:
-
-| Alias        | Claude Code         | Cursor                       | Use for                                                    |
-| ------------ | ------------------- | ---------------------------- | ---------------------------------------------------------- |
-| **fast**     | `claude-haiku-4-5`  | `composer-2-fast`            | Mechanical tasks, single-file edits, search/explore        |
-| **standard** | `claude-sonnet-4-6` | `claude-4.6-sonnet-medium`   | Multi-file implementation, code review, debugging          |
-| **strong**   | `claude-opus-4-7`   | `claude-4.6-opus-high`       | Architecture, design review, complex debugging, escalation |
+Three capability tiers (**fast / standard / strong**), mapped per platform. The authoritative table lives in [`skills/using-workflow/SKILL.md`](skills/using-workflow/SKILL.md#model-selection) — bump model IDs there.
 
 ## Skills (14)
 

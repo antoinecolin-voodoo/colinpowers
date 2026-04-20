@@ -1,6 +1,6 @@
 ---
 name: qa-product-changelog
-description: Use when asked to produce a branch changelog for QA, product, or other non-technical stakeholders — a bulleted list of changes linked to Linear issues, with technical commits translated for non-technical readers and meaningful ticketless commits included.
+description: Use when asked to produce a branch changelog or release notes for QA, product, or other non-technical stakeholders.
 ---
 
 # QA / Product changelog from a branch

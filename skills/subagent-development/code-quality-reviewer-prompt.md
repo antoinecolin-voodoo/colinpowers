@@ -6,7 +6,7 @@ Use this template when dispatching a **code quality** reviewer subagent.
 
 **Only dispatch after spec compliance review has passed.**
 
-**Model:** Use the **standard** tier by default. Escalate to **strong** for large diffs, security-sensitive code, or when a first pass is inconclusive. See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.
+**Model:** Use the **standard** tier by default. Escalate to **strong** for large diffs, security-sensitive code, or when a first pass is inconclusive. See `./SKILL.md` (and the authoritative per-platform table in `using-workflow/SKILL.md`).
 
 ## Template
 
