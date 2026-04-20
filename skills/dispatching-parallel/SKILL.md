@@ -76,12 +76,18 @@ Pick a model tier per subagent to match difficulty:
 
 (See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.)
 
-Illustrative shape (Claude Code `Agent` / Cursor `Task` — adjust to your platform's syntax):
+Illustrative shapes (pseudo-code — use your platform's real tool):
 
 ```text
-dispatch({ description: "Fix parser edge cases", prompt: "...", model: "<fast-tier>" })
-dispatch({ description: "Wire settings screen to store", prompt: "...", model: "<standard-tier>" })
-dispatch({ description: "Unify error handling strategy", prompt: "...", model: "<strong-tier>" })
+# Claude Code: Agent tool, one call per domain, sent in a single message
+Agent({ description: "Fix parser edge cases", prompt: "...", model: "<fast-tier>" })
+Agent({ description: "Wire settings screen to store", prompt: "...", model: "<standard-tier>" })
+Agent({ description: "Unify error handling strategy", prompt: "...", model: "<strong-tier>" })
+
+# Cursor: Task tool, same pattern
+Task({ description: "Fix parser edge cases", prompt: "...", model: "<fast-tier>" })
+Task({ description: "Wire settings screen to store", prompt: "...", model: "<standard-tier>" })
+Task({ description: "Unify error handling strategy", prompt: "...", model: "<strong-tier>" })
 ```
 
 Each `prompt` must be **self-contained**: paths, errors, acceptance criteria, and forbidden areas—everything a fresh agent needs without your chat history.

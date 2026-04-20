@@ -18,7 +18,16 @@ cp -R /path/to/colinpowers ~/.claude/plugins/local/colinpowers
 
 Restart Claude Code or start a new session. The `SessionStart` hook loads `using-workflow` automatically.
 
-Verify: in a new session, the `using-workflow` content should be injected as `hookSpecificOutput.additionalContext`.
+**Verify the install before restarting:**
+
+```bash
+ls ~/.claude/plugins/local/colinpowers/.claude-plugin/plugin.json \
+   ~/.claude/plugins/local/colinpowers/hooks/hooks.json
+```
+
+Both files must exist. If either is missing (e.g. you used `ln -s` by mistake), the plugin will load silently without hooks. Use a real directory copy, not a symlink.
+
+**Windows:** hooks are invoked through `hooks/run-hook.cmd`, a polyglot wrapper that locates Git for Windows (`C:\Program Files\Git\bin\bash.exe`) or bash on `PATH`. If neither is installed, the plugin still loads but `SessionStart` context injection is skipped silently.
 
 ### Cursor (local install)
 
@@ -28,6 +37,13 @@ cp -R /path/to/colinpowers ~/.cursor/plugins/local/colinpowers
 ```
 
 Restart Cursor (or **Developer: Reload Window**). The plugin should appear under **Settings > Plugins**.
+
+**Verify the install:**
+
+```bash
+ls ~/.cursor/plugins/local/colinpowers/.cursor-plugin/plugin.json \
+   ~/.cursor/plugins/local/colinpowers/hooks/hooks-cursor.json
+```
 
 > **Note:** Cursor's plugin loader uses `fs.readdir` with `withFileTypes`, which returns `isDirectory() = false` for symlinks. A symlink will be silently skipped — use a real directory copy.
 >

@@ -32,12 +32,12 @@ Prompt template:
 
 ## 2. Get the full commit log
 
-**Gotcha:** the Bash tool wrapper can truncate `git log` output with bodies. Always route through `/usr/bin/git --no-pager` and redirect to a temp file, then read via the Read tool. Writing to a file avoids truncation.
+**Gotcha:** the Bash tool wrapper can truncate `git log` output with bodies. Always use `--no-pager`, redirect to a temp file, and read via the Read tool. Writing to a file avoids truncation.
 
 **Dates:**
 
 ```bash
-/usr/bin/git --no-pager log \
+git --no-pager log \
   --since="<YYYY-MM-DD HH:MM>" --until="<YYYY-MM-DD HH:MM>" \
   --pretty=format:"===%n%h%n%s%n%b%n" <branch> \
   > /tmp/commits_full.txt
@@ -46,10 +46,12 @@ Prompt template:
 **Commit range:**
 
 ```bash
-/usr/bin/git --no-pager log \
+git --no-pager log \
   --pretty=format:"===%n%h%n%s%n%b%n" <start>..<end> \
   > /tmp/commits_full.txt
 ```
+
+**If output is still truncated:** some Claude Code configurations wrap `git` with a proxy that intercepts bare `git` invocations (e.g. token-optimization hooks). Bypass with `command git …`, `$(command -v git) …`, or the full path from `which git` — do not hard-code `/usr/bin/git`, which is Apple's Xcode stub on macOS.
 
 Then Read `/tmp/commits_full.txt`. Verify the line count looks reasonable (compare against `--oneline | wc -l`) — if the file is suspiciously short, the output was truncated and you need to re-run via the direct binary.
 
