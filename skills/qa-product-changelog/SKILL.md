@@ -152,7 +152,20 @@ For each ticketless commit, look for a backlog issue whose **title matches the c
 
 ## 7. Format the output
 
-Two sections, in this order.
+Begin with a **range header** line, then two sections.
+
+### Range header (mandatory)
+
+The very first line of the output must be:
+
+```
+QA / Product changelog — <branch> (<startSha>..<endSha>)
+```
+
+- `<branch>` is the branch argument the run used (e.g. `feature/guild-hall`).
+- `<startSha>` and `<endSha>` are the **7-char short SHAs** of the range endpoints.
+- Always emit both SHAs, even if the user gave the range as dates. Resolve dates to the first and last commit of the range before formatting — e.g. via `git --no-pager log --since=… --until=… --pretty=%h <branch>`, then take head/tail of that list.
+- This header is what downstream automation (e.g. the `announce-qa-build` skill) parses to chain the **next** run's `startSha` to this run's `endSha`. Skipping it breaks that chain.
 
 ### Section A — Changes with Linear tickets
 
@@ -195,7 +208,7 @@ Plain bullets, no Linear link. If there is a non-Linear tracker reference (e.g. 
 | Fetch | `get_issue` per ID, **in parallel**. |
 | Backlog cross-ref | Pick narrowest scope (project / team / cycle / assignee / recent / label / query) → `list_issues` → `jq` the saved file → match confidently only. |
 | Classify | Has ID / meaningful no-ID / internal / vague. Drop internal + vague. **Drop `Bug` team issues already in `Verified`.** |
-| Format | Section A (linked) + Section B (Bug fixes, Product/visual). Translate technical language. |
+| Format | **Range header line first** (`QA / Product changelog — <branch> (<startSha>..<endSha>)`, always both short SHAs), then Section A (linked) + Section B (Bug fixes, Product/visual). Translate technical language. |
 
 ---
 
