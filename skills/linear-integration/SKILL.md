@@ -62,14 +62,16 @@ Run when implementation is done and the **git-branch-workflow** (or equivalent) 
 
 **If a Linear issue was linked for this session:**
 
-1. **`save_issue`** — `{ "id": "<identifier>", "state": "In Review" }`  
-   Resolve state name via **`list_issue_statuses`** if needed, same as for In Progress.
+1. **`save_issue`** — set the handoff state for the issue's team:
+   - **Bug team** (workflow is Todo → In Progress → Fixed → Verified, no review state): `{ "id": "<identifier>", "state": "Fixed" }`. This is the explicit developer-handoff state in that team's flow; QA moves it to Verified from there.
+   - **All other teams:** `{ "id": "<identifier>", "state": "In Review" }`.
+   - If the state name is unknown or rejected, call **`list_issue_statuses`** with the issue's team, pick the closest developer-handoff equivalent, and retry. Do **not** fall through to a completed/verified state (e.g. "Verified", "Done", "Closed").
 2. If a **PR URL** exists: **`save_issue`** — `{ "id": "<identifier>", "links": [{ "url": "<pr url>", "title": "<short title e.g. PR #123>" }] }`  
    `links` is append-only; include the PR once.
 
 **If no issue was linked:** do nothing in Linear.
 
-**Never** set state to Done/Closed or otherwise close the issue; that stays a human decision.
+**Never** set state to Done/Closed/Verified or otherwise mark the fix as accepted; that stays a human decision. The **Bug** team's "Fixed" state is the one exception — it is the dev-side handoff in that team's workflow, not the accepted-by-QA state.
 
 ---
 

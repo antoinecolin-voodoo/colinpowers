@@ -111,13 +111,20 @@ Do not force-resolve conflicts or guess intent. When in doubt, ask.
 
 ### 4. Linear update
 
-- Set linked issue(s) to **In Review** using the **`linear-integration`** skill (or project-equivalent workflow).
+- Set linked issue(s) to the dev-handoff state using the **`linear-integration`** skill. That skill picks the right state per team ("In Review" for most teams; "Fixed" for the Voodoo **Bug** team, which has no review state).
 
-### 5. Merge or PR -- ask the user
+### 5. Merge (default) or PR
 
-Present two options clearly.
+**Default: merge into parent (Option 1).** Proceed with the merge without asking.
 
-**Option 1 -- Merge into parent (local integration)**
+**Ask the user to choose** between Option 1 and Option 2 only when **either**:
+
+- The user has already said they want a PR for this work (honor that), **or**
+- The parent branch is `develop`, `main`, `master`, or another shared long-lived integration branch. Merging directly into those usually skips team review; confirm the user really wants a direct merge rather than a PR.
+
+Otherwise (the common case — merging a sub-feature branch back into another feature branch), run Option 1 directly.
+
+**Option 1 -- Merge into parent (local integration) -- default**
 
 1. `git checkout <parent-branch>`
 2. `git pull` (fast-forward parent if applicable)
@@ -167,9 +174,9 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 | Specs | Remove task-local `docs/specs/*.md`, stage deletions |
 | Squash | One issue -> one commit `CUP-123: ...`; many issues -> rebase grouping + user confirm; no issue -> one descriptive commit |
 | Sync | `git fetch origin <parent>` -> `git merge origin/<parent>` into sub-feature; resolve conflicts with user |
-| Linear | In Review via `linear-integration` |
-| Merge | checkout parent -> pull -> merge sub-feature -> push parent -> `branch -d` / `push origin --delete` |
-| PR | `gh pr create --base <parent>` |
+| Linear | Dev-handoff state via `linear-integration` (In Review for most teams; Fixed for the Voodoo Bug team) |
+| Merge (default) | checkout parent -> pull -> merge sub-feature -> push parent -> `branch -d` / `push origin --delete`. Skip the PR prompt unless parent is `develop`/`main`/`master` or the user asked for a PR. |
+| PR (when asked or parent is shared integration branch) | `gh pr create --base <parent>` |
 
 ---
 
@@ -202,6 +209,6 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 | Caller | When |
 |--------|------|
 | **brainstorming** | After design is agreed, hand off **Starting work** steps: parent detection, branch name, `checkout -b`, push. |
-| **subagent-development** / **executing-plans** | When a task slice is **done**, run **Finishing work**: spec cleanup, squash policy, parent sync, Linear In Review, merge vs PR, checkout parent. |
+| **subagent-development** / **executing-plans** | When a task slice is **done**, run **Finishing work**: spec cleanup, squash policy, parent sync, Linear handoff state, merge (default) or PR when parent is shared or the user asked, checkout parent. |
 
 This skill **replaces** older flows that assumed a fresh clone per task or finishing only against `main`: one long-lived clone, parent feature branch, sub-feature branches, squash, merge or PR **to parent**.
