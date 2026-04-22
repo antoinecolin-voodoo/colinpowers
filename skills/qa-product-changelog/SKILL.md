@@ -159,7 +159,7 @@ Begin with a **range header** line, then two sections.
 The very first line of the output must be:
 
 ```
-QA / Product changelog — <branch> (<startSha>..<endSha>)
+Changelog — <branch> (<startSha>..<endSha>)
 ```
 
 - `<branch>` is the branch argument the run used (e.g. `feature/guild-hall`).
@@ -208,7 +208,7 @@ Plain bullets, no Linear link. If there is a non-Linear tracker reference (e.g. 
 | Fetch | `get_issue` per ID, **in parallel**. |
 | Backlog cross-ref | Pick narrowest scope (project / team / cycle / assignee / recent / label / query) → `list_issues` → `jq` the saved file → match confidently only. |
 | Classify | Has ID / meaningful no-ID / internal / vague. Drop internal + vague. **Drop `Bug` team issues already in `Verified`.** |
-| Format | **Range header line first** (`QA / Product changelog — <branch> (<startSha>..<endSha>)`, always both short SHAs), then Section A (linked) + Section B (Bug fixes, Product/visual). Translate technical language. |
+| Format | **Range header line first** (`Changelog — <branch> (<startSha>..<endSha>)`, always both short SHAs), then Section A (linked) + Section B (Bug fixes, Product/visual). Translate technical language. |
 
 ---
 
