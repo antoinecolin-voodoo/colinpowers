@@ -44,22 +44,22 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 **Goal before finishing:** Unity has refreshed the asset database (including `.meta` files where applicable) and the project compiles cleanly—or you have explicit human confirmation when automation cannot cover that.
 
-**Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via Coplay evidence and/or human confirmation, as below).
+**Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via ai-game-developer evidence and/or human confirmation, as below).
 
-#### A. Automated path — Coplay MCP
+#### A. Automated path — ai-game-developer MCP
 
-When the **Coplay** MCP server is available, call its **`check_compile_errors`** tool (platform-native MCP syntax — see `skills/using-workflow/references/cursor-tools.md`). In practice this ties into the Unity Editor: it reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and reports compilation errors.
+When the **ai-game-developer** MCP server is available, the compile check is a two-step flow (platform-native MCP syntax — see `skills/using-workflow/references/cursor-tools.md`). There is no single `check_compile_errors` tool on ai-game-developer — that was a Coplay tool name.
 
-1. Run **`check_compile_errors`** and read the full response.
-2. If it reports compile errors, fix them (or report blocked state with evidence). **Do not** continue to finishing until the check is clean.
-3. If the MCP call fails (server missing, Unity not connected, project root not set, auth, timeout, etc.), **do not** treat that as proof—fall through to **section B**.
+1. Run **`assets-refresh`** — refreshes the AssetDatabase, reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and forces script recompilation.
+2. Run **`console-get-logs`** and check for compile errors (CS**** entries). If errors are present, fix them (or report blocked state with evidence). **Do not** continue to finishing until the console is clean.
+3. If either MCP call fails (server missing, Unity not connected, project root not set, auth, timeout, etc.), **do not** treat that as proof—fall through to **section B**.
 
-#### B. Human validation — always when Coplay cannot replace it
+#### B. Human validation — always when ai-game-developer cannot replace it
 
 **Stop and ask the user** (full manual gate) when **any** of these apply:
 
-- Coplay is unavailable or **`check_compile_errors`** did not complete successfully.
-- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment Coplay does not certify.
+- ai-game-developer is unavailable or the **`assets-refresh`** + **`console-get-logs`** check did not complete successfully.
+- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment ai-game-developer does not certify.
 - Play Mode, runtime behavior, or acceptance criteria require the user to confirm in the Editor.
 
 Use this prompt:
@@ -197,7 +197,7 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 ## Red flags
 
 - Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
-- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean **`check_compile_errors`** result (when Coplay is used successfully) **and** human confirmation when section B requires it; **and** committing applicable `.meta` / import artifacts after the gate.
+- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean **`assets-refresh`** + **`console-get-logs`** result (when ai-game-developer is used successfully) **and** human confirmation when section B requires it; **and** committing applicable `.meta` / import artifacts after the gate.
 - Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
 - **Force-push** on a branch others use -- coordinate before rewriting shared history.
 - Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.

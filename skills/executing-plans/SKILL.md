@@ -46,7 +46,7 @@ For each task:
 
 After all tasks are complete and verified:
 
-1. **Unity validation gate** — follow **git-branch-workflow** § **Finishing work → 0. Unity validation gate**: when the **Coplay** MCP server is available, run **`check_compile_errors`** first for domain reload, `.meta` import side effects, and compile status; if Coplay is unavailable, the check fails, or **visual / scene-facing** work still needs human judgment, ask the user to validate in Unity. Commit `.meta` (and related import) changes after the gate passes.
+1. **Unity validation gate** — follow **git-branch-workflow** § **Finishing work → 0. Unity validation gate**: when the **ai-game-developer** MCP server is available, run **`assets-refresh`** first for domain reload, `.meta` import side effects, and recompilation, then check **`console-get-logs`** for compile errors; if ai-game-developer is unavailable, the check fails, or **visual / scene-facing** work still needs human judgment, ask the user to validate in Unity. Commit `.meta` (and related import) changes after the gate passes.
 2. Announce: "I'm using **git-branch-workflow** (finishing phase) to close out this work."
 3. Apply **`git-branch-workflow`** — section **Finishing work** (from step 1 onward): spec cleanup, squash, Linear update if your project uses it, merge vs PR to the **parent** branch, then checkout parent.
 
