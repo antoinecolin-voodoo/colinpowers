@@ -46,64 +46,73 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 **Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via Unity CLI evidence and/or human confirmation, as below).
 
-The gate runs on Unity's own local tooling: the **Unity CLI** (`unity`) plus the **Unity Pipeline package** (`com.unity.pipeline`), which exposes a running Editor over a local HTTP API the CLI talks to. **No MCP server is involved** — the CLI can start an MCP server (`unity mcp`), but the gate calls the CLI directly so it behaves identically in Claude Code, Cursor, and CI. Both tools are experimental/beta: check `unity <command> --help` for exact flags instead of trusting a remembered one.
+The gate runs on Unity's own local tooling: the **Unity CLI** (`unity`) driving the **Unity Pipeline package** (`com.unity.pipeline`), which hosts a local HTTP API inside the running Editor. **No MCP server is involved** — do not drive Unity from the shell any other way, and never launch the Editor binary directly.
+
+The command names below are the ones the pipeline registers (snake_case). Confirm what your project's Editor actually exposes with **`unity list`** (~140 commands), and read the project's own `AGENTS.md` / `CONTRIBUTING.md` first — project recipes win over this skill.
 
 Docs: [Unity Pipeline package](https://docs.unity.com/en-us/unity-production-pipeline/local-tools-cli/unity-pipeline-package) · [Unity CLI reference](https://docs.unity.com/en-us/unity-cli/unity-cli-reference)
 
-#### A. Prerequisites (verify once per machine / project)
+#### A. Prerequisites and CLI syntax
 
 ```bash
 unity --version        # CLI present (Unity Hub installs it; otherwise: brew install --cask unity-cli)
 unity auth status      # signed in -- run `unity auth login` if not
-unity pipeline list    # expect "Pipeline: Installed" plus the connected Editor and its port
+unity pipeline list    # expect "Pipeline: Installed" (com.unity.pipeline in Packages/manifest.json)
 ```
 
-- Editor **6.0 or later** is required for the Pipeline package.
-- Pipeline not installed: open the project in the Editor, run `unity pipeline install`, wait for the recompile, then re-run `unity pipeline list`.
-- Any of these failing means the automated path is unavailable — go to **section D**, do not fake the gate.
+- Editor **6.0 or later** is required by the pipeline package. If the package is missing: open the project in the Editor, run `unity pipeline install`, wait for the recompile, re-run `unity pipeline list`.
+- **Args are `--key value` *after* the command name.** `key=value` is silently ignored and the command then runs with defaults — e.g. `unity cmd menu path=…` lists every menu item instead of executing one.
+- **Global flags go *before* `cmd`** (`unity --json cmd …`, `--no-banner`, `--quiet`); after it they are forwarded to the Editor command as parameters.
+- With `--json`, some commands double-encode `result` as a JSON string — parse twice when needed.
+- Long operations are async: trigger, then poll the matching `*_status` command. Destructive commands need `--confirm true` and usually support `--dry_run true`.
+- Prereqs failing means the automated path is unavailable — go to **section D**, do not fake the gate.
 
-#### B. A Unity project is already open on the worktree — drive that instance
+#### B. A Unity Editor already has this worktree open — drive that instance
 
-Check for a live Editor **before** doing anything else:
+Check first:
 
 ```bash
-unity status --format json   # connected Editors: port, project path, version, PID
+unity status           # connected Editors: port, project, version, state
 ```
 
-If a connected Editor's project path is **this worktree**, use it. **Never launch a headless run against a project an Editor already has open** — Unity locks the project and the run dies on the lockfile.
+If a connected Editor has **this worktree** open, use it. **Never start a batch-mode run against a project an interactive Editor holds** — the two fight over the project lock.
 
-1. See what that Editor exposes: `unity command --project-path <worktree>` (or `unity list` for the tools plus their parameter schemas). `--project-path` is required only when several Editors are open; otherwise the CLI discovers the project from the current directory.
-2. Run the command that refreshes assets and recompiles scripts — that is what generates/updates `.meta` files and surfaces compile errors. If the Editor registers no dedicated command for it, use the Pipeline `eval` / `eval_file` command with a short C# snippet (`AssetDatabase.Refresh()`, then read compilation state / console) and read the returned payload.
-3. Compile errors: fix them, or report the blocked state with the CLI output as evidence. Do not continue until a **fresh** run comes back clean — output from an earlier session is not evidence either way.
-4. Non-zero exit, no connected Editor, auth or timeout failure: this path certified nothing — go to **section D**.
-
-#### C. No Editor open — headless Unity CLI
-
-With no Editor holding the project, compile it headlessly from the worktree:
+Compile check:
 
 ```bash
-unity test  --project-path <worktree> --format json   # Edit/Play Mode tests via the Editor test runner
-unity run   --project-path <worktree> --command <registered editor command>
-unity build --project-path <worktree> --format json   # full batch-mode build, CI-friendly flags
+unity cmd clear_console                                   # isolate this run's logs
+unity cmd menu --path "Assets/Refresh"                    # import changed assets, write .meta, trigger recompile
+unity cmd recompile_status                                # poll until completed / up_to_date
+unity cmd get_console_logs --severity error --limit 50    # errors only; avoid bare `console` (full stack traces)
 ```
 
-Pick the cheapest one that genuinely compiles the project: `unity test` when the project has Edit Mode tests, `unity run --command` for a registered compile/refresh command, `unity build` when only a real build settles it. Then read the **exit code** — it, not the log prose, is the gate:
+1. `unity cmd recompile` forces a recompile when the refresh does not pick the change up.
+2. Poll **`recompile_status`** until `completed` or `up_to_date`; its **`failed`** flag and **`errors[]`** array are the gate's evidence.
+3. Compile errors: fix them, or report the blocked state with the CLI output as evidence. Only a **fresh** clean status counts — output from an earlier session is not evidence either way.
+4. During a domain reload the HTTP server drops. Retry until **`editor_status`** reports `ready`; a dropped connection is not a failed check. If the Editor stalls while unfocused, `set_autotick` keeps it ticking.
+5. Tests on the live Editor when the change warrants them: `unity cmd run_tests --mode editor --filter <name> --timeout 240` (discover names with `list_tests`; long runs take `--async_tests true`, then poll `test_status`).
+6. No connected Editor, or the CLI path fails outright → **section C**, then **section D**.
+
+#### C. No Editor open — start one, or run the headless gate
+
+- **Start an interactive Editor:** `unity open .` launches the correct Editor version and returns immediately; poll `unity status` until the Editor appears `ready` (cold boot with import can take minutes). Then run **section B**.
+- **Headless gate:** `unity test . --mode EditMode --filter <name>` spawns a *separate* batch-mode Editor — the reliable choice for long PlayMode/determinism gates, and valid **only** when no interactive Editor holds the project.
+
+Read the CLI **exit code**, not the log prose:
 
 | Exit | Meaning for the gate |
 |------|----------------------|
 | `0` | Pass. |
-| `6` | Run never finished — compile error, licence, Editor crash, or timeout. **Not** a pass; investigate the output. |
+| `6` | Run never finished — compile error, licence, Editor crash, or `--timeout`. **Not** a pass; investigate the output. |
 | `8` | `unity test` only: tests ran and some failed. Fix them; retrying reproduces the same result. |
 | `7` | Unity service unreachable. Retryable — retry once, then treat as no evidence and go to **section D**. |
-
-`unity build` has no timeout by default: set `--timeout` (or `UNITY_BUILD_TIMEOUT`) rather than letting it hang, and expect a cold `Library` import to take minutes.
 
 #### D. Human validation — always when the CLI cannot replace it
 
 **Stop and ask the user** (full manual gate) when **any** of these apply:
 
-- The CLI path did not complete successfully: CLI missing, not signed in, Pipeline package absent, no connected Editor and no headless command that compiles, or an exit code you cannot resolve.
-- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment the CLI does not certify.
+- The CLI path did not complete successfully: CLI missing, not signed in, pipeline package absent, no Editor that can be started or connected, or an exit code / `errors[]` you cannot resolve.
+- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment the CLI does not certify. (`capture_game_view` / `capture_scene_view` screenshots inform that judgment; they do not replace it.)
 - Play Mode, runtime behavior, or acceptance criteria require the user to confirm in the Editor.
 
 Use this prompt:
@@ -119,7 +128,8 @@ Wait for the user's response. Do not proceed, guess, or skip this step when sect
 
 #### E. After the gate passes
 
-- Run **`git status`**. Stage and commit new or changed **`.meta`** files (and any Unity-generated assets that belong in VCS): e.g. `git add '*.meta'` plus other paths as needed, then commit with an appropriate message (e.g. `chore: Unity meta and import updates`).
+- Run **`git status`**. Stage and commit new or changed **`.meta`** files (and any Unity-generated assets that belong in VCS): e.g. `git add '*.meta'` plus other paths as needed, then commit with an appropriate message (e.g. `chore: Unity meta and import updates`). **Never hand-write a `.meta` file** — let the refresh above generate it.
+- **Keep editor-side noise out of the commit.** Driving the Editor over the pipeline's HTTP server can dirty project settings unrelated to your change — e.g. the server sets `Application.runInBackground`, which writes `runInBackground: 1` into `ProjectSettings/ProjectSettings.asset`. Review the diff and `git checkout -- <file>` any such artifact before committing.
 - Then continue to step 1 (Spec cleanup).
 
 ### 1. Spec cleanup
@@ -241,7 +251,7 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 ## Red flags
 
 - Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
-- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean Unity CLI result (open Editor via `unity command`, or headless `unity test` / `unity run` / `unity build` with exit `0`) **and** human confirmation when section D requires it; **and** committing applicable `.meta` / import artifacts after the gate.
+- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean Unity CLI result (`unity cmd menu --path "Assets/Refresh"` then `recompile_status` with no `errors[]`, or a headless `unity test .` at exit `0`) **and** human confirmation when section D requires it; **and** committing applicable `.meta` / import artifacts after the gate.
 - Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
 - **Force-push** on a branch others use -- coordinate before rewriting shared history.
 - Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.

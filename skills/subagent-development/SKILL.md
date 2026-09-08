@@ -82,9 +82,9 @@ digraph process {
     "Mark task complete in TodoWrite" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Dispatch final code reviewer subagent for entire implementation" [label="no"];
-    "Unity validation gate (Unity CLI: open Editor or headless run, and/or human)" [shape=box style=filled fillcolor=lightyellow];
-    "Dispatch final code reviewer subagent for entire implementation" -> "Unity validation gate (Unity CLI: open Editor or headless run, and/or human)";
-    "Unity validation gate (Unity CLI: open Editor or headless run, and/or human)" -> "Use git-branch-workflow (finish)";
+    "Unity validation gate (unity cmd refresh + recompile_status, or headless unity test, and/or human)" [shape=box style=filled fillcolor=lightyellow];
+    "Dispatch final code reviewer subagent for entire implementation" -> "Unity validation gate (unity cmd refresh + recompile_status, or headless unity test, and/or human)";
+    "Unity validation gate (unity cmd refresh + recompile_status, or headless unity test, and/or human)" -> "Use git-branch-workflow (finish)";
 }
 ```
 
@@ -192,7 +192,7 @@ Code reviewer: Important: magic number 100.
 
 [After all tasks: final code reviewer on full diff]
 
-[Unity validation gate: **git-branch-workflow** §0 — `unity status` to find an Editor open on the worktree and drive it with `unity command`; otherwise headless `unity test` / `unity run --command` / `unity build` with exit `0`; else or for visual/scene work, ask user to validate in Unity — WAIT when human gate applies]
+[Unity validation gate: **git-branch-workflow** §0 — `unity status`, then `unity cmd menu --path "Assets/Refresh"` + `unity cmd recompile_status` clean on the open Editor; otherwise `unity open .` or headless `unity test . --mode EditMode` at exit `0`; else or for visual/scene work, ask user to validate in Unity — WAIT when human gate applies]
 [Commit .meta / import changes if any]
 
 [Use git-branch-workflow — finishing: squash, PR/merge, cleanup per that skill]
@@ -224,7 +224,7 @@ Code reviewer: Important: magic number 100.
 
 **Never:**
 - Start implementation on `main`/`master` without explicit user consent.
-- Skip the **Unity validation gate** — follow **git-branch-workflow** §0 (Unity CLI against the open Editor, or a headless `unity test` / `unity run` / `unity build` at exit `0`; human confirmation when required); never finish without that gate and committing applicable `.meta` / import files.
+- Skip the **Unity validation gate** — follow **git-branch-workflow** §0 (`unity cmd` refresh + clean `recompile_status` on the open Editor, or a headless `unity test .` at exit `0`; human confirmation when required); never finish without that gate and committing applicable `.meta` / import files.
 - Skip spec compliance or code quality review.
 - Proceed with unfixed reviewer findings.
 - Run **multiple implementer subagents in parallel** on the same branch (merge conflicts).

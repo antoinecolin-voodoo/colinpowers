@@ -42,7 +42,7 @@ Skip any step = lying, not verifying
 | Claim | Requires | Not Sufficient |
 |-------|----------|----------------|
 | Compiles | Build output: 0 errors | Previous run, "should compile" |
-| Unity compiles + import refresh | Fresh Unity CLI run: refresh/compile command on the Editor open in the worktree (`unity command`), or headless `unity test` / `unity run` / `unity build` at exit `0`; otherwise human confirmation in Editor | Assuming compile without CLI output or user sign-off; a non-zero exit (`6`/`7`/`8`); output from an earlier session |
+| Unity compiles + import refresh | Fresh Unity CLI run: `unity cmd menu --path "Assets/Refresh"` then `recompile_status` at `completed`/`up_to_date` with `failed: false` and empty `errors[]`, or headless `unity test .` at exit `0`; otherwise human confirmation in Editor | Assuming compile without CLI output or user sign-off; a non-zero exit (`6`/`7`/`8`); `recompile_status` still running; output from an earlier session |
 | Works in editor | Manual Play Mode verification steps | Code looks right, no run |
 | Linter clean | Linter output: 0 errors | Partial check, extrapolation |
 | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
@@ -87,10 +87,12 @@ Skip any step = lying, not verifying
 **Unity (Unity CLI + Unity Pipeline package):**
 
 ```
-✅ [unity status -> Editor open on this worktree] [unity command <refresh/compile>] [See: no compile errors in the response] + commit .meta if changed
-✅ [No Editor open] [unity test --project-path . --format json] [See: exit 0] + commit .meta if changed
+✅ [unity status -> Editor holds this worktree] [unity cmd menu --path "Assets/Refresh"]
+   [unity cmd recompile_status -> completed, failed: false, errors[] empty] + commit .meta if changed
+✅ [No Editor open] [unity test . --mode EditMode] [See: exit 0] + commit .meta if changed
+❌ Read recompile_status once mid-run and call it clean (poll to completed / up_to_date)
 ❌ Treat exit 6 (run never finished: compile error, licence, crash, timeout) as a pass
-❌ Launch a headless run against a project an Editor already has open (lockfile kills it)
+❌ Start a batch-mode run while an interactive Editor holds the project
 ❌ Skip human check when visuals/scenes/UI changed and the CLI cannot validate appearance or Play Mode
 ```
 
