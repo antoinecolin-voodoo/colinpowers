@@ -51,6 +51,8 @@ git --no-pager log \
   > /tmp/commits_full.txt
 ```
 
+**Do not add a branch argument to the commit-range form.** `git log A..B <branch>` includes commits reachable from `<branch>` but not from `A` — i.e. commits that landed on `<branch>` *after* `B`. For a build changelog where `B` is the build's tip SHA, that silently leaks later commits into the report. The bare `<start>..<end>` form is already a topology query and is what you want; the branch arg is only for the dates form, which has no topological end-point.
+
 **If output is still truncated:** some Claude Code configurations wrap `git` with a proxy that intercepts bare `git` invocations (e.g. token-optimization hooks). Bypass with `command git …`, `$(command -v git) …`, or the full path from `which git` — do not hard-code `/usr/bin/git`, which is Apple's Xcode stub on macOS.
 
 Then Read `/tmp/commits_full.txt`. Verify the line count looks reasonable (compare against `--oneline | wc -l`) — if the file is suspiciously short, the output was truncated and you need to re-run via the direct binary.
@@ -216,6 +218,7 @@ Plain bullets, no Linear link. If there is a non-Linear tracker reference (e.g. 
 
 - **Guessing the range.** If the user said "since Thursday" without a date, ask or confirm the absolute date — do not pick one silently.
 - **Bash truncation.** Piping `git log` with `%b` through the Bash tool can silently drop commits. Always write to a temp file via `/usr/bin/git --no-pager` and Read it.
+- **Branch arg leaking later commits.** `git log A..B <branch>` is **not** "the range A..B scoped to the branch" — it ORs `<branch>` into the positive set, so commits that landed on `<branch>` after `B` show up too. For build changelogs the bare `git log <start>..<end>` form is the correct one.
 - **One Linear issue = one bullet.** If three commits all cite `LIVO-500`, write **one** bullet describing the combined change, not three.
 - **Technical descriptions leaking through.** "Added null check in NakamaService" is useless to QA. Rewrite as "fixed crash when claiming a completed guild quest".
 - **Sequential Linear fetches.** Always fetch issues in parallel — one round trip per ID wastes time.
