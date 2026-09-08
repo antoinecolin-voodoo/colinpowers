@@ -120,7 +120,9 @@ Do not force-resolve conflicts or guess intent. When in doubt, ask.
 **Ask the user to choose** between Option 1 and Option 2 only when **either**:
 
 - The user has already said they want a PR for this work (honor that), **or**
-- The parent branch is `develop`, `main`, `master`, or another shared long-lived integration branch. Merging directly into those usually skips team review; confirm the user really wants a direct merge rather than a PR.
+- The parent branch is `develop`, `main`, or `master`. Merging directly into those usually skips team review; confirm the user really wants a direct merge rather than a PR.
+
+Release branches (e.g. `release/x.y.z`) are treated like any other parent feature branch: run Option 1 directly without asking.
 
 Otherwise (the common case — merging a sub-feature branch back into another feature branch), run Option 1 directly.
 
