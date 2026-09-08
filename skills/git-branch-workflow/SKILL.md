@@ -44,22 +44,66 @@ Use this skill for **branch lifecycle** in projects where you stay in one clone 
 
 **Goal before finishing:** Unity has refreshed the asset database (including `.meta` files where applicable) and the project compiles cleanly—or you have explicit human confirmation when automation cannot cover that.
 
-**Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via ai-game-developer evidence and/or human confirmation, as below).
+**Do not start spec cleanup, squash, merge, or PR until this gate is satisfied** (via Unity CLI evidence and/or human confirmation, as below).
 
-#### A. Automated path — ai-game-developer MCP
+The gate runs on Unity's own local tooling: the **Unity CLI** (`unity`) plus the **Unity Pipeline package** (`com.unity.pipeline`), which exposes a running Editor over a local HTTP API the CLI talks to. **No MCP server is involved** — the CLI can start an MCP server (`unity mcp`), but the gate calls the CLI directly so it behaves identically in Claude Code, Cursor, and CI. Both tools are experimental/beta: check `unity <command> --help` for exact flags instead of trusting a remembered one.
 
-When the **ai-game-developer** MCP server is available, the compile check is a two-step flow (platform-native MCP syntax — see `skills/using-workflow/references/cursor-tools.md`). There is no single `check_compile_errors` tool on ai-game-developer — that was a Coplay tool name.
+Docs: [Unity Pipeline package](https://docs.unity.com/en-us/unity-production-pipeline/local-tools-cli/unity-pipeline-package) · [Unity CLI reference](https://docs.unity.com/en-us/unity-cli/unity-cli-reference)
 
-1. Run **`assets-refresh`** — refreshes the AssetDatabase, reloads the scripting domain, surfaces asset import side effects such as `.meta` generation/updates, and forces script recompilation.
-2. Run **`console-get-logs`** and check for compile errors (CS**** entries). If errors are present, fix them (or report blocked state with evidence). **Do not** continue to finishing until the console is clean.
-3. If either MCP call fails (server missing, Unity not connected, project root not set, auth, timeout, etc.), **do not** treat that as proof—fall through to **section B**.
+#### A. Prerequisites (verify once per machine / project)
 
-#### B. Human validation — always when ai-game-developer cannot replace it
+```bash
+unity --version        # CLI present (Unity Hub installs it; otherwise: brew install --cask unity-cli)
+unity auth status      # signed in -- run `unity auth login` if not
+unity pipeline list    # expect "Pipeline: Installed" plus the connected Editor and its port
+```
+
+- Editor **6.0 or later** is required for the Pipeline package.
+- Pipeline not installed: open the project in the Editor, run `unity pipeline install`, wait for the recompile, then re-run `unity pipeline list`.
+- Any of these failing means the automated path is unavailable — go to **section D**, do not fake the gate.
+
+#### B. A Unity project is already open on the worktree — drive that instance
+
+Check for a live Editor **before** doing anything else:
+
+```bash
+unity status --format json   # connected Editors: port, project path, version, PID
+```
+
+If a connected Editor's project path is **this worktree**, use it. **Never launch a headless run against a project an Editor already has open** — Unity locks the project and the run dies on the lockfile.
+
+1. See what that Editor exposes: `unity command --project-path <worktree>` (or `unity list` for the tools plus their parameter schemas). `--project-path` is required only when several Editors are open; otherwise the CLI discovers the project from the current directory.
+2. Run the command that refreshes assets and recompiles scripts — that is what generates/updates `.meta` files and surfaces compile errors. If the Editor registers no dedicated command for it, use the Pipeline `eval` / `eval_file` command with a short C# snippet (`AssetDatabase.Refresh()`, then read compilation state / console) and read the returned payload.
+3. Compile errors: fix them, or report the blocked state with the CLI output as evidence. Do not continue until a **fresh** run comes back clean — output from an earlier session is not evidence either way.
+4. Non-zero exit, no connected Editor, auth or timeout failure: this path certified nothing — go to **section D**.
+
+#### C. No Editor open — headless Unity CLI
+
+With no Editor holding the project, compile it headlessly from the worktree:
+
+```bash
+unity test  --project-path <worktree> --format json   # Edit/Play Mode tests via the Editor test runner
+unity run   --project-path <worktree> --command <registered editor command>
+unity build --project-path <worktree> --format json   # full batch-mode build, CI-friendly flags
+```
+
+Pick the cheapest one that genuinely compiles the project: `unity test` when the project has Edit Mode tests, `unity run --command` for a registered compile/refresh command, `unity build` when only a real build settles it. Then read the **exit code** — it, not the log prose, is the gate:
+
+| Exit | Meaning for the gate |
+|------|----------------------|
+| `0` | Pass. |
+| `6` | Run never finished — compile error, licence, Editor crash, or timeout. **Not** a pass; investigate the output. |
+| `8` | `unity test` only: tests ran and some failed. Fix them; retrying reproduces the same result. |
+| `7` | Unity service unreachable. Retryable — retry once, then treat as no evidence and go to **section D**. |
+
+`unity build` has no timeout by default: set `--timeout` (or `UNITY_BUILD_TIMEOUT`) rather than letting it hang, and expect a cold `Library` import to take minutes.
+
+#### D. Human validation — always when the CLI cannot replace it
 
 **Stop and ask the user** (full manual gate) when **any** of these apply:
 
-- ai-game-developer is unavailable or the **`assets-refresh`** + **`console-get-logs`** check did not complete successfully.
-- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment ai-game-developer does not certify.
+- The CLI path did not complete successfully: CLI missing, not signed in, Pipeline package absent, no connected Editor and no headless command that compiles, or an exit code you cannot resolve.
+- The work included **visual or scene-facing changes** that still need a human eye: UI layout, prefabs, scenes, materials, lighting, animation timing in context, or other editor-only judgment the CLI does not certify.
 - Play Mode, runtime behavior, or acceptance criteria require the user to confirm in the Editor.
 
 Use this prompt:
@@ -71,9 +115,9 @@ Use this prompt:
 >
 > Once you confirm everything is clean (or tell me what to fix), I'll commit `.meta` updates if any and proceed with squash, sync, and merge/PR.
 
-Wait for the user's response. Do not proceed, guess, or skip this step when section B applies.
+Wait for the user's response. Do not proceed, guess, or skip this step when section D applies.
 
-#### C. After the gate passes
+#### E. After the gate passes
 
 - Run **`git status`**. Stage and commit new or changed **`.meta`** files (and any Unity-generated assets that belong in VCS): e.g. `git add '*.meta'` plus other paths as needed, then commit with an appropriate message (e.g. `chore: Unity meta and import updates`).
 - Then continue to step 1 (Spec cleanup).
@@ -197,7 +241,7 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 ## Red flags
 
 - Current branch is `main` (or production default) and the user did not confirm switching to a feature parent -- **do not** invent a sub-feature off `main` without explicit instruction.
-- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean **`assets-refresh`** + **`console-get-logs`** result (when ai-game-developer is used successfully) **and** human confirmation when section B requires it; **and** committing applicable `.meta` / import artifacts after the gate.
+- Skipping the **Unity validation gate** — never start spec cleanup, squash, or merge/PR without a clean Unity CLI result (open Editor via `unity command`, or headless `unity test` / `unity run` / `unity build` with exit `0`) **and** human confirmation when section D requires it; **and** committing applicable `.meta` / import artifacts after the gate.
 - Uncommitted or untracked spec files outside `docs/specs/` -- do not delete blindly; only remove specs clearly tied to this task.
 - **Force-push** on a branch others use -- coordinate before rewriting shared history.
 - Multiple issues in one branch without a clear grouping -- get user confirmation before rebase/squash plan.

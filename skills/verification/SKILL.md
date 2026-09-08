@@ -42,7 +42,7 @@ Skip any step = lying, not verifying
 | Claim | Requires | Not Sufficient |
 |-------|----------|----------------|
 | Compiles | Build output: 0 errors | Previous run, "should compile" |
-| Unity compiles + import refresh | Fresh **`assets-refresh`** + error-free **`console-get-logs`** (ai-game-developer MCP) when available and successful; otherwise human confirmation in Editor | Assuming compile without tool output or user sign-off |
+| Unity compiles + import refresh | Fresh Unity CLI run: refresh/compile command on the Editor open in the worktree (`unity command`), or headless `unity test` / `unity run` / `unity build` at exit `0`; otherwise human confirmation in Editor | Assuming compile without CLI output or user sign-off; a non-zero exit (`6`/`7`/`8`); output from an earlier session |
 | Works in editor | Manual Play Mode verification steps | Code looks right, no run |
 | Linter clean | Linter output: 0 errors | Partial check, extrapolation |
 | Build succeeds | Build command: exit 0 | Linter passing, logs look good |
@@ -84,11 +84,14 @@ Skip any step = lying, not verifying
 ❌ "Linter passed" (linter doesn't check compilation)
 ```
 
-**Unity (ai-game-developer):**
+**Unity (Unity CLI + Unity Pipeline package):**
 
 ```
-✅ [Call ai-game-developer MCP `assets-refresh`, then `console-get-logs`] [See: no compile errors in logs] + commit .meta if changed
-❌ Skip human check when visuals/scenes/UI changed and ai-game-developer cannot validate appearance or Play Mode
+✅ [unity status -> Editor open on this worktree] [unity command <refresh/compile>] [See: no compile errors in the response] + commit .meta if changed
+✅ [No Editor open] [unity test --project-path . --format json] [See: exit 0] + commit .meta if changed
+❌ Treat exit 6 (run never finished: compile error, licence, crash, timeout) as a pass
+❌ Launch a headless run against a project an Editor already has open (lockfile kills it)
+❌ Skip human check when visuals/scenes/UI changed and the CLI cannot validate appearance or Play Mode
 ```
 
 **Acceptance criteria:**
