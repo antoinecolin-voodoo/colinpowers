@@ -1,15 +1,19 @@
 ---
 name: writing-plans-lean
-description: Use when you have a spec or requirements for a multi-step task, before touching code. Reference-first plans — shorter, reviewable, no full implementation bodies.
+description: Use when an approved spec is too big to implement inline in one session, or the user asks for an implementation plan. Reference-first plans — shorter, reviewable, no full implementation bodies.
 ---
 
 # Writing Plans (Lean)
 
 ## Overview
 
-Write implementation plans that focus on **what to build and how it connects** rather than paste-ready code. Document what to touch: exact paths, codebase references or contract snippets, verification commands, acceptance checks, and docs to read. Decompose into bite-sized tasks. Apply DRY and YAGNI. Prefer frequent, focused commits.
+Write implementation plans that focus on **what to build and how it connects** rather than paste-ready code. Document what to touch: exact paths, codebase references or contract snippets, verification commands, acceptance checks, and docs to read. Group the work into 2–4 workstreams, each a list of tasks. Apply DRY and YAGNI. Prefer frequent, focused commits.
 
 Assume an executor (human or AI agent) who can read the codebase but needs clear direction on intent, boundaries, and acceptance criteria.
+
+## When to write a plan
+
+Default: **no plan**. Implement from the spec inline. Write a plan only when the work is too big for one session (it would fill the context before it's done, typically multi-day work across many files), or when the user asks for one.
 
 **Announce at start:** "I'm using the writing-plans-lean skill to create the implementation plan."
 
@@ -39,7 +43,17 @@ Before tasks, map files to create or modify and each file's responsibility. Lock
 - Files that change together should live together when it fits the repo.
 - Follow existing project patterns; avoid drive-by restructures unless a touched file clearly needs splitting.
 
-Task boundaries should align with this map.
+Workstream and task boundaries should align with this map.
+
+## Workstreams
+
+Group the tasks into **2–4 workstreams**, never more than 4. Each one becomes a Linear sub-issue run by one agent (**subagent-development**), so it must stand on its own:
+
+- **Owns its files.** Two workstreams don't edit the same file; if one must, order them.
+- **States its dependencies** on other workstreams, so they run in the right order.
+- **Ends verifiable:** its own acceptance checks pass once it's merged.
+
+If the work doesn't split into at least two meaningful workstreams, it probably fits inline. Say so instead of forcing a split.
 
 ## Describing Implementation Steps
 
@@ -67,9 +81,9 @@ public interface IBarService {
 - Existing pattern in the codebase? **Reference mode.** Name the file and describe the delta.
 - Greenfield component or new architectural pattern? **Contract mode.** Write the minimal contract snippet.
 
-## Bite-Sized Task Granularity
+## Task Granularity
 
-**Each step is one short action (about 2–5 minutes).** Do not use a test-first loop. A typical task uses this rhythm:
+Tasks are a workstream's checklist, not units of dispatch: size each as one coherent change that ends in a verify and a commit. Do not use a test-first loop. A typical task uses this rhythm:
 
 1. **Implement** — describe the change with a **codebase reference** or **contract snippet** (see above).
 2. **Verify** — compile or run the project's standard check; confirm behavior against acceptance criteria; note expected outcomes.
@@ -84,7 +98,7 @@ Repeat Implement → Verify → Commit per logical slice. Multiple implement sub
 ```markdown
 # [Feature Name] Implementation Plan
 
-> **For agentic workers:** Use **subagent-development** (recommended) or **executing-plans** to run this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** Run inline with **executing-plans** if the plan fits one session; otherwise use **subagent-development** (one agent per workstream). Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** [One sentence]
 
@@ -95,13 +109,18 @@ Repeat Implement → Verify → Commit per logical slice. Multiple implement sub
 ---
 ```
 
-## Task Structure
+## Workstream and Task Structure
 
 Each task uses **one** mode — the template below shows both for reference:
 
 
 ````markdown
-### Task N: [Component Name]
+## Workstream A: [Name]
+
+**Sub-issue:** [ID, added once created] · **Depends on:** [— or Workstream X]
+**Acceptance:** [checks that prove this workstream works once merged]
+
+### Task A1: [Component Name]
 
 **Files:**
 - Create: `exact/path/to/file.ext`
@@ -148,7 +167,7 @@ If no Linear issue exists yet, omit the trailing ` [ISSUE-KEY]` from the commit 
 
 After the plan is complete:
 
-1. Dispatch a **plan-document-reviewer** subagent via your platform's subagent tool (Claude Code `Agent` or Cursor `Task`) at the **standard** model tier. Give **only** crafted context: path to the plan file, path to the spec/design doc, and review criteria (scope, paths, reference/contract precision, verify steps, commit hygiene, Linear ID usage). Do not paste full session history.
+1. Dispatch a **plan-document-reviewer** subagent via your platform's subagent tool (Claude Code `Agent` or Cursor `Task`). Give **only** crafted context: path to the plan file, path to the spec/design doc, and review criteria (scope, workstream grouping, paths, reference/contract precision, verify steps, commit hygiene, Linear ID usage). Do not paste full session history.
 2. If the reviewer reports issues: fix the plan document, then re-dispatch the reviewer on the **whole** plan.
 3. If approved: proceed to execution handoff.
 
@@ -156,25 +175,17 @@ After the plan is complete:
 
 ## Execution Handoff
 
-After saving the plan, offer:
+After saving the plan, recommend one path and say why:
 
-**"Plan saved to `docs/plans/<filename>.md`. Two execution options:**
-
-**1. Subagent-driven (recommended)** — **Task** dispatches a fresh subagent per task; review between tasks; fast iteration. Follow **subagent-development**.
-
-**2. Inline execution** — Run tasks in this session with checkpoints for review. Follow **executing-plans**.
-
-**Which do you want?"**
-
-**If subagent-driven:** require **subagent-development**; one subagent per plan task (or per batch if that skill defines batching).
-
-**If inline:** require **executing-plans**; batch with explicit review checkpoints between groups of tasks.
+- **Inline** (**executing-plans**): the whole plan fits in this session.
+- **Workstream agents** (**subagent-development**): it doesn't. That skill creates the Linear sub-issues first, then runs one agent per workstream.
 
 ## Remember
 
 - Scope check and file map before tasks.
-- Bite-sized steps without a mandated test-first workflow.
+- No plan unless the work won't fit one session.
+- 2–4 workstreams, each a sub-issue for one agent; tasks are its checklist. No mandated test-first workflow.
 - Implement → verify → commit per task pattern.
 - **Reference mode first; contract mode when no pattern exists.**
 - Linear IDs in commit messages when available.
-- Plan review via **Task** + standard-model reviewer subagent; execution via **subagent-development** or **executing-plans**.
+- Plan review via **Task** + standard-model reviewer subagent; execution inline (**executing-plans**) or per workstream (**subagent-development**).

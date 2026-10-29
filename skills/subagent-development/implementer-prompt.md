@@ -1,106 +1,73 @@
 # Implementer subagent prompt template
 
-Use this template when dispatching an **implementer** subagent (Claude Code's `Agent` tool or Cursor's `Task` tool).
-
-**Model:** Use the **fast** tier when the task is mechanical (1–2 files, clear spec). Escalate to **standard** or **strong** when the task needs more judgment (see `SKILL.md` for the tier-to-model mapping per platform).
+Use this template when dispatching the implementer for one workstream (Claude Code's `Agent` tool or Cursor's `Task` tool).
 
 ```
-Task:
-  description: "Implement Task N: [short task name]"
-  model: "fast"
-  subagent_type: generalPurpose
+Agent:
+  description: "Implement <SUB-ID>: <workstream name>"
+  model: opus
   prompt: |
-    You are implementing Task N: [task name]
+    You are implementing one workstream of a larger plan, tracked as Linear sub-issue <SUB-ID>.
 
-    ## Task description
+    ## Your workstream
 
-    [FULL TEXT of the task from the plan—paste here. Do not rely on reading the plan file yourself unless explicitly told to.]
+    [Paste the workstream's section from the plan: scope, files, tasks, acceptance checks.]
 
     ## Context
 
-    [Scene-setting: where this fits, dependencies, constraints, architecture notes.]
+    - Spec: <path>. Read it before you start.
+    - Branch: <sub-branch>, checked out in <directory>. Commit there. Don't merge, push, or update Linear: the coordinator does that.
+    - Already merged into the parent branch: [what earlier workstreams delivered that you build on]
+    - Owned by other workstreams, don't touch: [files or areas]
+    - Project rules: read AGENTS.md / CONTRIBUTING.md (or the repo's equivalent) for conventions and how to build and test.
 
     ## Before you begin
 
-    If anything is unclear about:
-    - Requirements or acceptance criteria
-    - Approach or implementation strategy
-    - Dependencies or assumptions
-    - Wording or scope in the task
-
-    **Ask now.** Raise concerns before writing code.
+    If the requirements, approach, or scope are unclear, **ask now** (report NEEDS_CONTEXT) rather than guess.
 
     ## Your job
 
-    Once requirements are clear:
-    1. Implement exactly what the task specifies.
-    2. **Verify** your implementation compiles and meets the acceptance criteria (build, manual checks, or project-standard checks as applicable).
-    3. Commit your work.
-    4. Self-review (see below).
-    5. Report back in the required format.
+    1. Work through the tasks in order. Commit at each task's commit point, with <SUB-ID> in the message.
+    2. **Verify**: the project builds, its checks pass, and the workstream's acceptance checks hold.
+    3. Self-review (see below) and fix what you find.
+    4. Report back in the format below.
 
-    Work from: [directory or repo root]
-
-    **While you work:** If something unexpected or ambiguous appears, **stop and ask**. Do not guess or broaden scope silently.
+    **While you work:** if something unexpected or ambiguous appears, stop and ask. Stay inside your workstream; don't broaden scope silently.
 
     ## Code organization
 
-    You reason best when files stay focused. Keep this in mind:
     - Follow the file structure defined in the plan.
     - Each file should have one clear responsibility and a well-defined interface.
-    - If a new file is growing beyond the plan’s intent, stop and report **DONE_WITH_CONCERNS**—do not split or reorganize without plan guidance.
+    - If a new file is growing beyond the plan's intent, report **DONE_WITH_CONCERNS**; don't split or reorganize without plan guidance.
     - If an existing file you touch is already large or tangled, proceed carefully and note it as a concern.
-    - In existing codebases, follow established patterns. Improve only what you touch in reasonable ways; do not restructure unrelated areas.
+    - Follow established patterns. Improve what you touch in reasonable ways; don't restructure unrelated areas.
 
     ## When you are stuck
 
-    It is always acceptable to say the task is too hard or too unclear. Poor work is worse than none. Escalation is not a failure.
+    It is always acceptable to say the work is too hard or too unclear. Poor work is worse than none.
 
     **Stop and escalate** (BLOCKED or NEEDS_CONTEXT) when:
-    - The task needs architectural choices among several valid approaches not decided in the plan.
-    - You need understanding beyond what was provided and cannot resolve it by reading the codebase in reasonable time.
-    - You are unsure your approach matches intent.
-    - The plan did not anticipate required refactors of existing code.
-    - You are circling without progress after substantial exploration.
+    - The workstream needs an architectural choice the plan didn't make.
+    - You need understanding you can't get from the spec and codebase in reasonable time.
+    - The plan didn't anticipate a required refactor of existing code.
+    - You are circling without progress.
 
-    **How to escalate:** Report **BLOCKED** or **NEEDS_CONTEXT**. State what you tried, exactly what is missing or blocking, and what would unblock you (context, stronger review, smaller task, human decision).
+    Say what you tried, what exactly is missing or blocking, and what would unblock you.
 
     ## Before reporting back: self-review
 
-    **Completeness**
-    - Did you implement everything in the task and acceptance criteria?
-    - Any missed requirements or edge cases?
-
-    **Quality**
-    - Is this your best work for this scope?
-    - Are names accurate and clear?
-    - Is the code readable and maintainable?
-
-    **Discipline**
-    - Did you avoid overbuilding (YAGNI)?
-    - Did you stay within the requested scope?
-    - Did you follow existing project patterns?
-
-    **Verification**
-    - Does the project build (or the relevant subset)?
-    - Do the acceptance criteria you were given actually hold for what you implemented?
-
-    Fix issues you find before reporting.
+    - **Completeness:** every task and acceptance check done? Missed edge cases?
+    - **Quality:** clear names, readable code, your best work for this scope?
+    - **Discipline:** no overbuilding (YAGNI), inside your workstream, existing patterns followed?
+    - **Verification:** the project builds and the acceptance checks actually hold?
 
     ## Report format
 
-    When done, report:
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What you implemented (or what you attempted, if blocked)
-    - **Verification:** what you ran or checked (compile, criteria, manual steps) and the outcome
-    - Files changed (paths)
-    - Self-review findings (if any)
-    - Issues or concerns
+    - What you implemented (or attempted, if blocked)
+    - **Verification:** what you ran or checked, and the outcome
+    - Commits and files changed
+    - Concerns, and anything the next workstreams should know (new APIs, changed behavior)
 
-    Use **DONE_WITH_CONCERNS** if you finished but have correctness or scope doubts.
-    Use **BLOCKED** if you cannot complete the task.
-    Use **NEEDS_CONTEXT** if required information was not provided.
     Never deliver work you know is speculative without saying so.
 ```
-
-**Controller notes:** Omit `model: "fast"` (or set the appropriate field) when you intentionally use a standard or strong implementer. Always paste the full task text and context into `prompt:`—do not substitute “read the plan” unless the task is explicitly scoped to discovery.

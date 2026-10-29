@@ -5,7 +5,7 @@ Custom plugin for **Claude Code** and **Cursor**, based on [Superpowers](https:/
 - **Dual-platform** — skills use Claude Code tool names as canonical vocabulary, with a reference file mapping them to Cursor's native tools. A single session-start hook emits the right JSON shape for whichever host is loading the plugin.
 - **Linear integration** — issue tracking via MCP (status updates, backlog search, comments).
 - **Branch management** — sub-feature branches off parent feature branches, squash-and-merge.
-- **Three-tier model selection** — fast / standard / strong, mapped to the right model IDs on each platform.
+- **Opus everywhere** — the main session and every subagent.
 
 ## Installation
 
@@ -84,13 +84,13 @@ Import the GitHub repo as a team marketplace via **Dashboard > Settings > Plugin
 ## Usage
 
 - Type `/using-workflow` in the first prompt of a conversation. (A session-start hook already injects it — this is mostly optional.)
-- Works best with a **strong**-tier model (`claude-opus-4-7` on Claude Code, `claude-4.6-opus-high` on Cursor) as the orchestrator; subagents pick smaller tiers.
+- Run the session on Opus; subagents use Opus too.
 - Call individual skills directly when useful. `git-branch-workflow` and `requesting-code-review` are the most common stand-alone invocations.
 - `qa-product-changelog` generates a QA/product-friendly changelog for a branch (with Linear links).
 
 ## Models
 
-Three capability tiers (**fast / standard / strong**), mapped per platform. The authoritative table lives in [`skills/using-workflow/SKILL.md`](skills/using-workflow/SKILL.md#model-selection) — bump model IDs there.
+Opus for everything, main session and subagents. The rule lives in [`skills/using-workflow/SKILL.md`](skills/using-workflow/SKILL.md#model-selection) — bump the model ID there.
 
 ## Skills (14)
 
@@ -98,9 +98,9 @@ Three capability tiers (**fast / standard / strong**), mapped per platform. The 
 | ------------------------ | ------------------------------------------------------ |
 | `using-workflow`         | Entry point — routing, platform adaptation, models     |
 | `brainstorming`          | Socratic design refinement before coding               |
-| `writing-plans-lean`     | Reference-first plans — shorter, reviewable            |
-| `executing-plans`        | Sequential plan execution with checkpoints             |
-| `subagent-development`   | Subagent-per-task with two-stage review                |
+| `writing-plans-lean`     | Reference-first plans, only for work too big for inline |
+| `executing-plans`        | Inline plan execution with checkpoints                 |
+| `subagent-development`   | 2–4 agents per plan, one Linear sub-issue each         |
 | `dispatching-parallel`   | Run multiple agents concurrently                       |
 | `git-branch-workflow`    | Branch creation, squash, merge/PR, cleanup             |
 | `linear-integration`     | Issue status, backlog search, comments (via Linear MCP)|
@@ -130,9 +130,11 @@ The LLM usually does this mapping automatically; the reference file is there for
 2. linear-integration: fetch/search issue → set "In Progress"
 3. brainstorming: design conversation → spec
 4. git-branch-workflow (start): create sub-feature branch
-5. writing-plans-lean: implementation plan
-6. subagent-development: implement tasks with review
-7. verification: confirm everything works
-8. git-branch-workflow (finish): spec cleanup → squash → merge/PR
-9. linear-integration: set "In Review"
+5. Implement inline from the spec (default)
+   Too big for one session: writing-plans-lean (2–4 workstreams)
+   → Linear sub-issues → subagent-development (one agent per workstream)
+6. verification: confirm everything works
+7. git-branch-workflow (finish): spec cleanup → squash → merge/PR
+   (requesting-code-review runs a pre-PR review first)
+8. linear-integration: set "In Review"
 ```

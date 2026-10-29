@@ -66,28 +66,18 @@ Each task should include:
 
 Use your platform's subagent tool once per independent domain — `Agent` in Claude Code, `Task` in Cursor. Send a **single message** with multiple subagent invocations so they run concurrently.
 
-Pick a model tier per subagent to match difficulty:
-
-| Tier | Use for |
-|------|---------|
-| **fast** | Mechanical edits, grep-level fixes, straightforward refactors, docstring or config tweaks |
-| **standard** | Most feature work, bugfixes that touch several files, wiring and integration |
-| **strong** | Ambiguous requirements, cross-cutting design, performance or concurrency reasoning, large refactors |
-
-(See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.)
+Every subagent runs on Opus (**using-workflow**, Model selection).
 
 Illustrative shapes (pseudo-code — use your platform's real tool):
 
 ```text
 # Claude Code: Agent tool, one call per domain, sent in a single message
-Agent({ description: "Fix parser edge cases", prompt: "...", model: "<fast-tier>" })
-Agent({ description: "Wire settings screen to store", prompt: "...", model: "<standard-tier>" })
-Agent({ description: "Unify error handling strategy", prompt: "...", model: "<strong-tier>" })
+Agent({ description: "Fix parser edge cases", prompt: "...", model: "opus" })
+Agent({ description: "Wire settings screen to store", prompt: "...", model: "opus" })
 
 # Cursor: Task tool, same pattern
-Task({ description: "Fix parser edge cases", prompt: "...", model: "<fast-tier>" })
-Task({ description: "Wire settings screen to store", prompt: "...", model: "<standard-tier>" })
-Task({ description: "Unify error handling strategy", prompt: "...", model: "<strong-tier>" })
+Task({ description: "Fix parser edge cases", prompt: "...", model: "<newest Opus>" })
+Task({ description: "Wire settings screen to store", prompt: "...", model: "<newest Opus>" })
 ```
 
 Each `prompt` must be **self-contained**: paths, errors, acceptance criteria, and forbidden areas—everything a fresh agent needs without your chat history.

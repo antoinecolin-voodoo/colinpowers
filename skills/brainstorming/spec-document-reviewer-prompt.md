@@ -9,7 +9,6 @@ Use this template when dispatching a spec document reviewer via your platform's 
 ## Subagent dispatch
 
 - Run a subagent whose sole job is spec review.
-- Set the model to the **standard** tier when the tool exposes a model choice (see `subagent-development/SKILL.md` for the tier-to-model mapping per platform).
 - Put the filled prompt below in the subagent's prompt field. Replace `[SPEC_FILE_PATH]` with the repository-relative path to the spec file.
 
 **Example subagent fields (illustrative):**

@@ -13,7 +13,7 @@ Dispatch the **code-reviewer** agent (see `agents/code-reviewer.md` in this plug
 
 **Mandatory:**
 
-- After each task when using **subagent-development** (or equivalent multi-task subagent flow)
+- After each workstream when using **subagent-development**
 - After completing a **major feature**
 - **Before opening a pull request**: see [Before opening a pull request](#before-opening-a-pull-request)
 - **Before merge** to the main integration branch
@@ -50,7 +50,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 ## Before opening a pull request
 
-1. Commit everything, then dispatch a **strong-tier** subagent (Claude Code: `Agent` with `model: "opus"`) to review the branch against the PR's base. If the project has its own PR-review skill (Draft Showdown: `review-pr --base <branch>`), have the subagent follow it; otherwise brief it from `code-reviewer.md`. Give it the planned PR title and body as the requirements, not your case for the code. It reports back only: no edits, nothing posted.
+1. Commit everything, then dispatch an Opus subagent (Claude Code: `Agent` with `model: "opus"`) to review the branch against the PR's base. If the project has its own PR-review skill (Draft Showdown: `review-pr --base <branch>`), have the subagent follow it; otherwise brief it from `code-reviewer.md`. Give it the planned PR title and body as the requirements, not your case for the code. It reports back only: no edits, nothing posted.
 2. Verify each finding in the code (**receiving-code-review**), then sort it:
    - **Fix**: the default, cheap nits included.
    - **Skip**: wrong, or not worth the churn. One-line reason.
@@ -83,7 +83,7 @@ You finished a task and want review before the next one.
 
 | Workflow | How review fits in |
 |----------|-------------------|
-| **subagent-development** | After **each** task: review before starting the next so defects do not stack. |
+| **subagent-development** | After **each** workstream: review before the next one builds on it. |
 | **executing-plans** | After each batch or milestone: review, apply feedback, then continue the plan. |
 | **Ad-hoc** | At minimum before merge; also when stuck or after risky changes. |
 

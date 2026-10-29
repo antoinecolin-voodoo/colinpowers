@@ -1,6 +1,6 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: Use when executing a written implementation plan inline, in this session or a new one, with review checkpoints
 ---
 
 # Executing plans
@@ -11,7 +11,7 @@ Load the plan, review it critically, execute tasks in order, then close out with
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
-**Subagents:** When subagent dispatch is available (Claude Code's `Agent` tool or Cursor's `Task` tool), use **`subagent-development`** for large plans or clearly independent workstreams instead of doing everything in one thread — throughput and focus usually improve.
+**Too big for one session?** Use **subagent-development** instead: one agent per workstream, each on its own Linear sub-issue.
 
 ## The process
 
@@ -83,4 +83,4 @@ Do not push through blockers silently.
 |--------|------|
 | **writing-plans-lean** | Creates the structured plan this skill executes. |
 | **git-branch-workflow** | **Finishing work** after all tasks: cleanup, squash, merge or PR to parent, branch hygiene. |
-| **subagent-development** | When **Task** subagents are available, split or parallelize execution for suitable plans. |
+| **subagent-development** | When the plan doesn't fit one session: one agent per workstream. |

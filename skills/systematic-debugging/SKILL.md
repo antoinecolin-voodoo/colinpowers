@@ -48,17 +48,6 @@ Use for **any** technical issue:
 - You are in a hurry (rushing guarantees rework)
 - Someone wants it fixed now (systematic is faster than thrashing)
 
-## Model guidance
-
-- **Start** debugging at the **standard** model tier.
-- **Escalate** to the **strong** tier if:
-  - Phase 2 does not surface a clear pattern (working vs broken comparison stays unclear), or
-  - Phase 3 hypotheses keep failing after disciplined minimal tests.
-
-(See `subagent-development/SKILL.md` for the tier-to-model mapping per platform.)
-
-Hard or cross-cutting bugs often need stronger reasoning; do not burn time guessing at the wrong tier.
-
 ## The four phases
 
 You **must** complete each phase before proceeding to the next.
@@ -216,7 +205,7 @@ You **must** complete each phase before proceeding to the next.
    - **Reproduction steps** so the subagent can verify its own fix
    - **Constraints**: one change at a time, no "while I am here" improvements, no bundled refactoring
 
-   Use the **fast** model for mechanical fixes (1-2 files, straightforward edit) and the **standard** model for multi-file or judgment-heavy fixes. Do **not** dump your full investigation history into the subagent -- curate context, not copy context.
+   Do **not** dump your full investigation history into the subagent -- curate context, not copy context.
 
    **When implementing directly:**
    - Address the root cause you identified
@@ -253,7 +242,7 @@ You **must** complete each phase before proceeding to the next.
    - Are we persisting through inertia?
    - Should we refactor architecture instead of continuing symptom fixes?
 
-   **Escalate** for architectural discussion with your team (and consider the **strong** model) before more local fixes.
+   **Escalate** for architectural discussion with your team before more local fixes.
 
    This is not a failed hypothesis -- it may be the wrong shape of solution.
 

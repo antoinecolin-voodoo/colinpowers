@@ -22,9 +22,9 @@ When a skill mentions a tool name you don't have, check the mapping file — don
 |-------|------|
 | **using-workflow** | This entry skill — routing, models, red flags. |
 | **brainstorming** | Creative or exploratory feature / behavior work before implementation. |
-| **writing-plans-lean** | You have a spec or multi-step requirements — before coding. Reference-first plans. |
-| **executing-plans** | Running a written plan in order with checkpoints. |
-| **subagent-development** | Same, but one subagent per separable task. |
+| **writing-plans-lean** | Only when a spec is too big to implement inline in one session, or the user asks for a plan. Otherwise implement inline from the spec. |
+| **executing-plans** | Running a written plan inline with checkpoints. |
+| **subagent-development** | A plan too big for one session: 2–4 agents, one Linear sub-issue each. |
 | **dispatching-parallel** | Two or more independent tasks safe to run in parallel. |
 | **git-branch-workflow** | **Before any implementation** (code changes, plan execution, bug fixes) — check current branch and create a sub-feature branch if needed. Also when integrating or closing branch work. |
 | **linear-integration** | Linear issues / workflow via the Linear MCP server. |
@@ -48,13 +48,7 @@ This gate applies even when brainstorming was skipped (direct tasks, quick fixes
 
 ## Model selection
 
-Three capability tiers. Pick the model your platform exposes at that tier.
-
-| Tier | Use for | Claude Code | Cursor |
-|------|---------|-------------|--------|
-| **fast** | Mechanical edits, 1–2 files, search, small refactors. | `claude-haiku-4-5` | `composer-2-fast` |
-| **standard** | Multi-file work, integration, review, most debugging. | `claude-sonnet-4-6` | `claude-4.6-sonnet-medium` |
-| **strong** | Architecture, design tradeoffs, hard debugging, escalation. | `claude-opus-4-7` | `claude-4.6-opus-high` |
+**Opus for everything:** the main session and every subagent, whatever the task. Claude Code: `Agent` with `model: "opus"` (currently `claude-opus-5-5`). Cursor: the newest Opus in the model picker.
 
 ## Rationalization prevention
 

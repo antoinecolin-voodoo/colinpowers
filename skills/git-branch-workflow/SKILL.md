@@ -266,6 +266,6 @@ After Option 1, you are already on parent. After Option 2, run `git checkout <pa
 | Caller | When |
 |--------|------|
 | **brainstorming** | After design is agreed, hand off **Starting work** steps: parent detection, branch name, `checkout -b`, push. |
-| **subagent-development** / **executing-plans** | When a task slice is **done**, run **Finishing work**: spec cleanup, squash policy, parent sync, Linear handoff state, merge (default) or PR when parent is shared or the user asked, checkout parent. |
+| **subagent-development** / **executing-plans** | When a workstream's sub-branch or the whole plan is **done**, run **Finishing work**: spec cleanup, squash policy, parent sync, Linear handoff state, merge (default) or PR when parent is shared or the user asked, checkout parent. |
 
 This skill **replaces** older flows that assumed a fresh clone per task or finishing only against `main`: one long-lived clone, parent feature branch, sub-feature branches, squash, merge or PR **to parent**.
