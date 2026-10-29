@@ -194,6 +194,7 @@ No extra confirmation for branch deletion after merge -- this is the default for
 
 **Option 2 -- Open pull request**
 
+0. **Required:** run the pre-PR review from **requesting-code-review** (Before opening a pull request). Squash its fixes into the branch's commit(s), and don't open the PR while a finding still needs the user's call.
 1. Ensure squashed branch is pushed: `git push -u origin <sub-feature-branch>`
 2. Create PR with GitHub CLI, **base = parent branch**, not `main`:
 

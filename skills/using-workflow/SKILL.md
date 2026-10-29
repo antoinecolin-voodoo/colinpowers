@@ -28,7 +28,7 @@ When a skill mentions a tool name you don't have, check the mapping file — don
 | **dispatching-parallel** | Two or more independent tasks safe to run in parallel. |
 | **git-branch-workflow** | **Before any implementation** (code changes, plan execution, bug fixes) — check current branch and create a sub-feature branch if needed. Also when integrating or closing branch work. |
 | **linear-integration** | Linear issues / workflow via the Linear MCP server. |
-| **requesting-code-review** | After meaningful work or before merge — structured review pass. |
+| **requesting-code-review** | After meaningful work, before opening a PR, or before merge — structured review pass. |
 | **receiving-code-review** | Acting on review comments before editing further. |
 | **systematic-debugging** | Bugs, failures, or unexpected behavior — before speculative fixes. |
 | **verification** | Before claiming done, fixed, or passing — run checks and cite fresh output. |
